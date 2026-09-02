@@ -1,5 +1,10 @@
 /* El cargo se define en el ingreso validado y no se cambia desde el tablero. */
 .role-switch button { pointer-events: none; cursor: default; }
+.coach-context { grid-template-columns: 20px 1fr auto auto !important; }
+.coach-context .coach-logout { color: #c64b5e; }
+.session-logout { position: fixed; z-index: 45; top: 18px; right: 82px; height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: 13px; background: var(--card); color: var(--muted-foreground); display: flex; align-items: center; gap: 6px; box-shadow: var(--glass-shadow); backdrop-filter: blur(18px); cursor: pointer; font-size: 10px; font-weight: 750; }
+.session-logout:hover { color: #d34f62; border-color: rgba(211,79,98,.28); }
+.session-logout svg { width: 15px; }
 
 @media (max-width: 900px) {
   .login-overlay { grid-template-columns: 1fr; }
@@ -31,10 +36,14 @@
   .extra-challenge-dock { left: 14px; bottom: 82px; }
   .selected-order { grid-template-columns: repeat(3, 1fr); }
   .tick-grid { grid-template-columns: 1fr; }
+  .session-logout { right: 66px; top: 12px; width: 38px; height: 38px; padding: 0; justify-content: center; }
+  .session-logout span { display: none; }
+  .coach-context { grid-template-columns: 18px 1fr auto !important; }
+  .coach-context .coach-logout { grid-column: 2 / -1; justify-self: end; }
 }
 
 @media print {
-  .login-overlay, .mascot-launcher, .coach-panel, .certificate-shortcut, .extra-challenge-dock { display: none !important; }
+  .login-overlay, .mascot-launcher, .coach-panel, .certificate-shortcut, .extra-challenge-dock, .session-logout { display: none !important; }
   body[data-print="certificate"] .print-receipt { display: none !important; }
   body[data-print="certificate"] .print-certificate { display: block !important; color: #102840; background: white; font-family: Georgia, "Times New Roman", serif; }
   body[data-print="certificate"] { background: white !important; }

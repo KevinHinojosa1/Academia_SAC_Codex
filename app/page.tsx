@@ -1,105 +1,2283 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, XAxis } from "recharts";
-import { AlertTriangle, Award, BarChart3, Camera, Check, CheckCircle2, ChevronRight, ClipboardCheck, Clock3, Coins, Eye, Flame, Gamepad2, Gift, Glasses, GraduationCap, Home, Image as ImageIcon, LockKeyhole, Medal, Moon, MoveRight, Play, PlayCircle, Printer, RotateCcw, ScanSearch, ShieldCheck, Sparkles, Star, Sun, Target, Timer, Trophy, Upload, Users, XCircle, Zap } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  PolarAngleAxis,
+  PolarGrid,
+  Radar,
+  RadarChart,
+  ResponsiveContainer,
+  XAxis,
+} from "recharts";
+import {
+  AlertTriangle,
+  Award,
+  BarChart3,
+  Camera,
+  Check,
+  CheckCircle2,
+  ChevronRight,
+  ClipboardCheck,
+  Clock3,
+  Coins,
+  Eye,
+  Flame,
+  Gamepad2,
+  Gift,
+  Glasses,
+  GraduationCap,
+  Home,
+  Image as ImageIcon,
+  LockKeyhole,
+  Medal,
+  Moon,
+  MoveRight,
+  Play,
+  PlayCircle,
+  Printer,
+  RotateCcw,
+  ScanSearch,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Sun,
+  Target,
+  Timer,
+  Trophy,
+  Upload,
+  Users,
+  XCircle,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { AcademyEnhancements } from "./academy-enhancements";
 
 type View = "inicio" | "academia" | "retos" | "ranking" | "ficha";
 type Role = "Asesor" | "Optómetra";
 
 const modules = [
-  { id: 1, title: "Recepción sin riesgos", eyebrow: "Fundamentos", role: "Todos", xp: 80, duration: "8 min", icon: ShieldCheck, color: "cyan", description: "Por qué revisar, informar y documentar antes de recibir." },
-  { id: 2, title: "Anatomía del armazón", eyebrow: "Inspección", role: "Asesor", xp: 100, duration: "12 min", icon: Glasses, color: "blue", description: "Aro, puente, bisagras, varillas, terminales y plaquetas." },
-  { id: 3, title: "Calor y manipulación", eyebrow: "Técnica", role: "Optómetra", xp: 120, duration: "14 min", icon: Flame, color: "orange", description: "Cómo explicar los procesos y sus posibles consecuencias." },
-  { id: 4, title: "Semáforo de riesgo", eyebrow: "Criterio", role: "Todos", xp: 120, duration: "10 min", icon: ScanSearch, color: "violet", description: "Clasifique el riesgo sin prometer resultados ni omitir alertas." },
-  { id: 5, title: "Conversación con el cliente", eyebrow: "Comunicación", role: "Asesor", xp: 100, duration: "11 min", icon: Users, color: "cyan", description: "Explique con claridad, empatía y tratamiento de usted." },
-  { id: 6, title: "Evidencia fotográfica", eyebrow: "Trazabilidad", role: "Todos", xp: 90, duration: "7 min", icon: Camera, color: "blue", description: "Tomas frontal, lateral y detalle de cada novedad visible." },
-  { id: 7, title: "Ficha y aceptación", eyebrow: "Proceso", role: "Asesor", xp: 130, duration: "15 min", icon: ClipboardCheck, color: "violet", description: "Complete el formulario, explique las cláusulas y obtenga la firma." },
-  { id: 8, title: "Casos críticos", eyebrow: "Certificación", role: "Optómetra", xp: 160, duration: "18 min", icon: AlertTriangle, color: "orange", description: "Fisuras, reparaciones, antigüedad y decisiones de escalamiento." },
+  {
+    id: 1,
+    title: "Recepción sin riesgos",
+    eyebrow: "Fundamentos",
+    role: "Todos",
+    xp: 80,
+    duration: "8 min",
+    icon: ShieldCheck,
+    color: "cyan",
+    description: "Por qué revisar, informar y documentar antes de recibir.",
+  },
+  {
+    id: 2,
+    title: "Anatomía del armazón",
+    eyebrow: "Inspección",
+    role: "Asesor",
+    xp: 100,
+    duration: "12 min",
+    icon: Glasses,
+    color: "blue",
+    description: "Aro, puente, bisagras, varillas, terminales y plaquetas.",
+  },
+  {
+    id: 3,
+    title: "Calor y manipulación",
+    eyebrow: "Técnica",
+    role: "Optómetra",
+    xp: 120,
+    duration: "14 min",
+    icon: Flame,
+    color: "orange",
+    description: "Cómo explicar los procesos y sus posibles consecuencias.",
+  },
+  {
+    id: 4,
+    title: "Semáforo de riesgo",
+    eyebrow: "Criterio",
+    role: "Todos",
+    xp: 120,
+    duration: "10 min",
+    icon: ScanSearch,
+    color: "violet",
+    description:
+      "Clasifique el riesgo sin prometer resultados ni omitir alertas.",
+  },
+  {
+    id: 5,
+    title: "Conversación con el cliente",
+    eyebrow: "Comunicación",
+    role: "Asesor",
+    xp: 100,
+    duration: "11 min",
+    icon: Users,
+    color: "cyan",
+    description: "Explique con claridad, empatía y tratamiento de usted.",
+  },
+  {
+    id: 6,
+    title: "Evidencia fotográfica",
+    eyebrow: "Trazabilidad",
+    role: "Todos",
+    xp: 90,
+    duration: "7 min",
+    icon: Camera,
+    color: "blue",
+    description: "Tomas frontal, lateral y detalle de cada novedad visible.",
+  },
+  {
+    id: 7,
+    title: "Ficha y aceptación",
+    eyebrow: "Proceso",
+    role: "Asesor",
+    xp: 130,
+    duration: "15 min",
+    icon: ClipboardCheck,
+    color: "violet",
+    description:
+      "Complete el formulario, explique las cláusulas y obtenga la firma.",
+  },
+  {
+    id: 8,
+    title: "Casos críticos",
+    eyebrow: "Certificación",
+    role: "Optómetra",
+    xp: 160,
+    duration: "18 min",
+    icon: AlertTriangle,
+    color: "orange",
+    description:
+      "Fisuras, reparaciones, antigüedad y decisiones de escalamiento.",
+  },
 ];
 
 const levels = [
   { name: "Observador", min: 0, max: 499, icon: Eye },
   { name: "Inspector", min: 500, max: 1199, icon: ScanSearch },
   { name: "Guardián de Calidad", min: 1200, max: 2199, icon: ShieldCheck },
-  { name: "Especialista OLA", min: 2200, max: 3499, icon: Award },
+  { name: "Especialista SAC", min: 2200, max: 3499, icon: Award },
   { name: "Maestro de Recepción", min: 3500, max: 99999, icon: Trophy },
 ];
 
 const quiz = [
-  { q: "Un armazón de tres años se ve bien. ¿Qué corresponde?", options: ["Recibirlo sin observaciones", "Revisarlo, explicar riesgos y documentarlo", "Garantizar que no se romperá"], answer: 1, why: "La antigüedad no confirma un daño, pero exige una revisión más cuidadosa y una explicación previa." },
-  { q: "¿Cuándo debe firmar el cliente?", options: ["Antes de conocer el procedimiento", "Después de revisar y comprender la explicación", "Al retirar el producto"], answer: 1, why: "La firma documenta una explicación real; no la reemplaza." },
-  { q: "Se observa una fisura pequeña. ¿Cuál es el primer paso?", options: ["Ocultarla para no preocupar", "Mostrarla, fotografiarla y registrarla", "Continuar porque es mínima"], answer: 1, why: "Toda condición preexistente debe quedar visible y documentada antes del proceso." },
-  { q: "¿Cuál frase es correcta?", options: ["Si se rompe no es nuestra culpa", "No le va a pasar nada", "Queremos explicarle las condiciones y posibles riesgos antes de continuar"], answer: 2, why: "La comunicación profesional informa sin culpar ni prometer." },
-  { q: "¿Qué fotografía no debe faltar?", options: ["Solo la caja", "Frontal y laterales; detalle si hay novedad", "Una foto distante del local"], answer: 1, why: "Las vistas consistentes permiten comparar el estado recibido." },
-  { q: "Si el riesgo es alto, el asesor debe…", options: ["Ignorar la alerta", "Escalar para validación y documentar", "Pedir una firma rápida"], answer: 1, why: "La aceptación no sustituye el criterio técnico ni el escalamiento." },
-  { q: "El calor controlado…", options: ["Siempre se aplica", "Nunca representa riesgo", "Puede ser necesario según material, diseño y condición"], answer: 2, why: "No todos los armazones requieren el mismo proceso." },
-  { q: "¿Cuál es el principio central?", options: ["Firmar primero", "Revisar, informar, registrar y luego firmar", "Explicar solo si ocurre un daño"], answer: 1, why: "El protocolo preventivo ocurre antes de procesar el armazón." },
+  {
+    q: "Un armazón de tres años se ve bien. ¿Qué corresponde?",
+    options: [
+      "Recibirlo sin observaciones",
+      "Revisarlo, explicar riesgos y documentarlo",
+      "Garantizar que no se romperá",
+    ],
+    answer: 1,
+    why: "La antigüedad no confirma un daño, pero exige una revisión más cuidadosa y una explicación previa.",
+  },
+  {
+    q: "¿Cuándo debe firmar el cliente?",
+    options: [
+      "Antes de conocer el procedimiento",
+      "Después de revisar y comprender la explicación",
+      "Al retirar el producto",
+    ],
+    answer: 1,
+    why: "La firma documenta una explicación real; no la reemplaza.",
+  },
+  {
+    q: "Se observa una fisura pequeña. ¿Cuál es el primer paso?",
+    options: [
+      "Ocultarla para no preocupar",
+      "Mostrarla, fotografiarla y registrarla",
+      "Continuar porque es mínima",
+    ],
+    answer: 1,
+    why: "Toda condición preexistente debe quedar visible y documentada antes del proceso.",
+  },
+  {
+    q: "¿Cuál frase es correcta?",
+    options: [
+      "Si se rompe no es nuestra culpa",
+      "No le va a pasar nada",
+      "Queremos explicarle las condiciones y posibles riesgos antes de continuar",
+    ],
+    answer: 2,
+    why: "La comunicación profesional informa sin culpar ni prometer.",
+  },
+  {
+    q: "¿Qué fotografía no debe faltar?",
+    options: [
+      "Solo la caja",
+      "Frontal y laterales; detalle si hay novedad",
+      "Una foto distante del local",
+    ],
+    answer: 1,
+    why: "Las vistas consistentes permiten comparar el estado recibido.",
+  },
+  {
+    q: "Si el riesgo es alto, el asesor debe…",
+    options: [
+      "Ignorar la alerta",
+      "Escalar para validación y documentar",
+      "Pedir una firma rápida",
+    ],
+    answer: 1,
+    why: "La aceptación no sustituye el criterio técnico ni el escalamiento.",
+  },
+  {
+    q: "El calor controlado…",
+    options: [
+      "Siempre se aplica",
+      "Nunca representa riesgo",
+      "Puede ser necesario según material, diseño y condición",
+    ],
+    answer: 2,
+    why: "No todos los armazones requieren el mismo proceso.",
+  },
+  {
+    q: "¿Cuál es el principio central?",
+    options: [
+      "Firmar primero",
+      "Revisar, informar, registrar y luego firmar",
+      "Explicar solo si ocurre un daño",
+    ],
+    answer: 1,
+    why: "El protocolo preventivo ocurre antes de procesar el armazón.",
+  },
 ];
 
 const leaderboard = [
-  { rank: 1, name: "María Fernanda", role: "Optómetra", store: "Scala", xp: 3840, accuracy: 98, streak: 18 },
-  { rank: 2, name: "Andrés Molina", role: "Asesor", store: "CCI", xp: 3650, accuracy: 96, streak: 15 },
-  { rank: 3, name: "Gema García", role: "Optómetra", store: "Mall del Pacífico", xp: 3410, accuracy: 97, streak: 12 },
-  { rank: 4, name: "Noemí Palma", role: "Asesor", store: "Mall del Pacífico", xp: 2980, accuracy: 94, streak: 11 },
-  { rank: 5, name: "Carlos Ruiz", role: "Asesor", store: "Quicentro", xp: 2640, accuracy: 92, streak: 9 },
+  {
+    rank: 1,
+    name: "María Fernanda",
+    role: "Optómetra",
+    store: "Scala",
+    xp: 3840,
+    accuracy: 98,
+    streak: 18,
+  },
+  {
+    rank: 2,
+    name: "Andrés Molina",
+    role: "Asesor",
+    store: "CCI",
+    xp: 3650,
+    accuracy: 96,
+    streak: 15,
+  },
+  {
+    rank: 3,
+    name: "Gema García",
+    role: "Optómetra",
+    store: "Mall del Pacífico",
+    xp: 3410,
+    accuracy: 97,
+    streak: 12,
+  },
+  {
+    rank: 4,
+    name: "Noemí Palma",
+    role: "Asesor",
+    store: "Mall del Pacífico",
+    xp: 2980,
+    accuracy: 94,
+    streak: 11,
+  },
+  {
+    rank: 5,
+    name: "Carlos Ruiz",
+    role: "Asesor",
+    store: "Quicentro",
+    xp: 2640,
+    accuracy: 92,
+    streak: 9,
+  },
 ];
-const weekly = [{day:"Lun",xp:80},{day:"Mar",xp:120},{day:"Mié",xp:70},{day:"Jue",xp:180},{day:"Vie",xp:140},{day:"Sáb",xp:90},{day:"Dom",xp:110}];
-const mastery = [{skill:"Revisión",value:92},{skill:"Riesgo",value:78},{skill:"Explicación",value:88},{skill:"Evidencia",value:72},{skill:"Ficha",value:84}];
-const riskData = [{name:"Correctas",value:84,color:"#24d5c4"},{name:"A reforzar",value:16,color:"#ff9d43"}];
-const rewards = [{name:"Certificado digital",coins:300,tag:"Reconocimiento",icon:Award},{name:"Insignia Experto OLA",coins:550,tag:"Perfil interno",icon:Medal},{name:"Kit de reconocimiento",coins:900,tag:"Premio sugerido",icon:Gift},{name:"Mención mensual",coins:1200,tag:"Cuadro de honor",icon:Trophy}];
-const navItems:{id:View;label:string;icon:typeof Home}[]=[{id:"inicio",label:"Inicio",icon:Home},{id:"academia",label:"Academia",icon:GraduationCap},{id:"retos",label:"Retos",icon:Gamepad2},{id:"ranking",label:"Ranking",icon:Trophy},{id:"ficha",label:"Ficha digital",icon:ClipboardCheck}];
+const weekly = [
+  { day: "Lun", xp: 80 },
+  { day: "Mar", xp: 120 },
+  { day: "Mié", xp: 70 },
+  { day: "Jue", xp: 180 },
+  { day: "Vie", xp: 140 },
+  { day: "Sáb", xp: 90 },
+  { day: "Dom", xp: 110 },
+];
+const mastery = [
+  { skill: "Revisión", value: 92 },
+  { skill: "Riesgo", value: 78 },
+  { skill: "Explicación", value: 88 },
+  { skill: "Evidencia", value: 72 },
+  { skill: "Ficha", value: 84 },
+];
+const riskData = [
+  { name: "Correctas", value: 84, color: "#24d5c4" },
+  { name: "A reforzar", value: 16, color: "#ff9d43" },
+];
+const rewards = [
+  {
+    name: "Certificado digital",
+    coins: 300,
+    tag: "Reconocimiento",
+    icon: Award,
+  },
+  {
+    name: "Insignia Experto SAC",
+    coins: 550,
+    tag: "Perfil interno",
+    icon: Medal,
+  },
+  {
+    name: "Kit de reconocimiento",
+    coins: 900,
+    tag: "Premio sugerido",
+    icon: Gift,
+  },
+  {
+    name: "Mención mensual",
+    coins: 1200,
+    tag: "Cuadro de honor",
+    icon: Trophy,
+  },
+];
+const navItems: { id: View; label: string; icon: typeof Home }[] = [
+  { id: "inicio", label: "Inicio", icon: Home },
+  { id: "academia", label: "Academia", icon: GraduationCap },
+  { id: "retos", label: "Retos", icon: Gamepad2 },
+  { id: "ranking", label: "Ranking", icon: Trophy },
+  { id: "ficha", label: "Ficha digital", icon: ClipboardCheck },
+];
 
-function StatCard({icon:Icon,label,value,note,tone="cyan"}:{icon:typeof Home;label:string;value:string;note:string;tone?:string}){return <article className="glass-card stat-card"><div className={`icon-orb ${tone}`}><Icon/></div><div><p className="meta">{label}</p><strong>{value}</strong><span>{note}</span></div></article>}
-
-function GlassesDiagram(){return <div className="anatomy-card"><svg viewBox="0 0 620 260" role="img" aria-label="Partes del armazón"><defs><linearGradient id="fg" x1="0" x2="1"><stop stopColor="#24d5c4"/><stop offset="1" stopColor="#477dff"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M72 121Q88 82 168 83Q246 86 250 132Q248 198 157 198Q79 197 72 121M548 121Q532 82 452 83Q374 86 370 132Q372 198 463 198Q541 197 548 121M250 123Q310 91 370 123M74 110L25 86M546 110L595 86" fill="none" stroke="url(#fg)" strokeWidth="12" strokeLinecap="round" filter="url(#glow)"/><g className="diagram-labels"><line x1="128" y1="84" x2="103" y2="40"/><text x="58" y="30">ARO</text><line x1="310" y1="105" x2="310" y2="45"/><text x="276" y="30">PUENTE</text><line x1="545" y1="104" x2="568" y2="52"/><text x="532" y="36">BISAGRA</text><line x1="585" y1="88" x2="598" y2="155"/><text x="510" y="181">VARILLA</text><line x1="25" y1="86" x2="20" y2="154"/><text x="8" y="180">TERMINAL</text><circle cx="280" cy="133" r="8"/><line x1="280" y1="141" x2="260" y2="219"/><text x="205" y="242">PLAQUETA</text></g></svg><p>Confirme integridad, simetría, movimiento y señales de reparación.</p></div>}
-
-function VideoLesson(){const[url,setUrl]=useState<string|null>(null);useEffect(()=>()=>{if(url)URL.revokeObjectURL(url)},[url]);return <div className="video-lesson">{url?<video src={url} controls autoPlay className="training-video"/>:<div className="video-placeholder"><div className="heat-demo"><div className="lens left"/><div className="lens right"/><div className="bridge"/><span className="heat h1">≈</span><span className="heat h2">≈</span><span className="heat h3">≈</span></div><div><span className="pill"><PlayCircle/>Microclase visual</span><h4>Calor controlado y tensión del material</h4><p>Animación demostrativa. También puede cargar un video interno.</p></div></div>}<label className="upload-video"><Upload/>{url?"Cambiar video":"Cargar video interno"}<input type="file" accept="video/*" onChange={e=>{const f=e.target.files?.[0];if(f)setUrl(URL.createObjectURL(f))}}/></label></div>}
-
-function SignaturePad({onChange}:{onChange:(v:string)=>void}){const ref=useRef<HTMLCanvasElement>(null),drawing=useRef(false);const point=(e:React.PointerEvent<HTMLCanvasElement>)=>{const c=ref.current!,r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*(c.width/r.width),y:(e.clientY-r.top)*(c.height/r.height)}};const start=(e:React.PointerEvent<HTMLCanvasElement>)=>{drawing.current=true;const p=point(e),c=ref.current!;c.getContext("2d")!.beginPath();c.getContext("2d")!.moveTo(p.x,p.y);c.setPointerCapture(e.pointerId)};const move=(e:React.PointerEvent<HTMLCanvasElement>)=>{if(!drawing.current)return;const p=point(e),c=ref.current!,x=c.getContext("2d")!;x.lineWidth=3;x.lineCap="round";x.strokeStyle="#1675ff";x.lineTo(p.x,p.y);x.stroke()};const stop=()=>{if(!drawing.current)return;drawing.current=false;onChange(ref.current!.toDataURL())};const clear=()=>{const c=ref.current!;c.getContext("2d")!.clearRect(0,0,c.width,c.height);onChange("")};return <div className="signature-wrap"><canvas ref={ref} width={700} height={190} onPointerDown={start} onPointerMove={move} onPointerUp={stop} onPointerCancel={stop}/><button type="button" onClick={clear}><RotateCcw/>Limpiar firma</button></div>}
-
-export default function HomePage(){
- const[view,setView]=useState<View>("inicio"),[dark,setDark]=useState(true),[role,setRole]=useState<Role>("Asesor"),[xp,setXp]=useState(760),[coins,setCoins]=useState(420),[completed,setCompleted]=useState<number[]>([1,2]);
- const[selectedModule,setSelectedModule]=useState<(typeof modules)[number]|null>(null),[quizOpen,setQuizOpen]=useState(false),[quizIndex,setQuizIndex]=useState(0),[quizScore,setQuizScore]=useState(0),[quizFeedback,setQuizFeedback]=useState<{ok:boolean;why:string}|null>(null),[quizDone,setQuizDone]=useState(false);
- const[riskRound,setRiskRound]=useState(0),[riskScore,setRiskScore]=useState(0),[riskFeedback,setRiskFeedback]=useState<string|null>(null),[reportFilter,setReportFilter]=useState("Todos"),[toast,setToast]=useState<string|null>(null),[signature,setSignature]=useState(""),[photos,setPhotos]=useState<string[]>([]),[risk,setRisk]=useState<"Bajo"|"Medio"|"Alto">("Bajo");
- const[form,setForm]=useState<Record<string,string>>({date:new Date().toISOString().slice(0,10),frameMaterial:"Metal",frameType:"Completo",lensType:"Monofocal",purchasePlace:"Óptica Los Andes",age:"Menos de 1 año"});
- const[checks,setChecks]=useState<Record<string,boolean>>({reviewed:false,shown:false,manipulation:false,heat:false,age:false,risks:false,questions:false});
- useEffect(()=>{const saved=localStorage.getItem("ola-academy-state");if(saved)try{const s=JSON.parse(saved);setXp(s.xp??760);setCoins(s.coins??420);setCompleted(s.completed??[1,2]);setRole(s.role??"Asesor")}catch{}const t=localStorage.getItem("ola-theme"),d=t!=="light";setDark(d);document.documentElement.classList.toggle("dark",d)},[]);
- useEffect(()=>{localStorage.setItem("ola-academy-state",JSON.stringify({xp,coins,completed,role}))},[xp,coins,completed,role]);useEffect(()=>{document.documentElement.classList.toggle("dark",dark);localStorage.setItem("ola-theme",dark?"dark":"light")},[dark]);useEffect(()=>{if(toast){const t=setTimeout(()=>setToast(null),2800);return()=>clearTimeout(t)}},[toast]);
- const li=Math.max(0,levels.findIndex(l=>xp>=l.min&&xp<=l.max)),currentLevel=levels[li],nextLevel=levels[Math.min(levels.length-1,li+1)],levelProgress=currentLevel===nextLevel?100:Math.round(((xp-currentLevel.min)/(nextLevel.min-currentLevel.min))*100),completion=Math.round(completed.length/modules.length*100),allChecks=Object.values(checks).every(Boolean);
- const riskCases=[{title:"Armazón de 4 meses, sin daños y sin reparaciones",answer:"Bajo",detail:"Buen estado, poca antigüedad y sin señales preexistentes."},{title:"Armazón de 2 años, tornillo flojo y ligera deformación",answer:"Medio",detail:"Debe documentarse y explicarse antes de continuar."},{title:"Armazón de 3 años con fisura y soldadura anterior",answer:"Alto",detail:"Requiere evidencia y escalamiento para validación."}];
- const award=(m:string,x:number,c:number)=>{setXp(v=>v+x);setCoins(v=>v+c);setToast(`${m} · ${x>=0?"+":""}${x} XP · ${c>=0?"+":""}${c} OLA Coins`)};
- const completeModule=()=>{if(!selectedModule)return;if(!completed.includes(selectedModule.id)){setCompleted(v=>[...v,selectedModule.id]);award("Módulo completado",selectedModule.xp,Math.round(selectedModule.xp/4))}setSelectedModule(null)};
- const answerQuiz=(i:number)=>{if(quizFeedback)return;const q=quiz[quizIndex],ok=i===q.answer;if(ok)setQuizScore(v=>v+1);setQuizFeedback({ok,why:q.why})};
- const nextQuiz=()=>{if(quizIndex===quiz.length-1){setQuizDone(true);const f=quizScore;if(f>=6)award("Certificación aprobada",f===8?240:180,f===8?80:50)}else{setQuizIndex(v=>v+1);setQuizFeedback(null)}};
- const resetQuiz=()=>{setQuizIndex(0);setQuizScore(0);setQuizFeedback(null);setQuizDone(false)};
- const chooseRisk=(choice:string)=>{if(riskFeedback)return;const i=riskCases[riskRound],ok=choice===i.answer;if(ok)setRiskScore(v=>v+1);setRiskFeedback(ok?`Correcto. ${i.detail}`:`La clasificación correcta es ${i.answer}. ${i.detail}`)};
- const nextRisk=()=>{if(riskRound===riskCases.length-1){award("Laboratorio de riesgo completado",riskScore===3?140:90,riskScore===3?45:25);setRiskRound(0);setRiskScore(0);setRiskFeedback(null)}else{setRiskRound(v=>v+1);setRiskFeedback(null)}};
- const setField=(k:string,v:string)=>setForm(s=>({...s,[k]:v}));useEffect(()=>{const t=`${form.frameState??""} ${form.lensState??""} ${form.repairs??""}`.toLowerCase();if(/fisur|triz|rot|sold|quebrad/.test(t)||form.age==="Más de 2 años")setRisk("Alto");else if(/ray|desgast|flojo|deform/.test(t)||form.age==="1 a 2 años")setRisk("Medio");else setRisk("Bajo")},[form.frameState,form.lensState,form.repairs,form.age]);
- const handlePhotos=(files:FileList|null)=>{if(files)setPhotos(Array.from(files).slice(0,4).map(URL.createObjectURL))};
- return <><div className="site-shell app-screen"><aside className="sidebar glass-panel"><div className="brand"><div className="brand-mark"><Glasses/></div><div><strong>ACADEMIA OLA</strong><span>Recepción segura</span></div></div><nav>{navItems.map(i=><button key={i.id} onClick={()=>setView(i.id)} className={view===i.id?"active":""}><i.icon/><span>{i.label}</span>{i.id==="retos"&&<b>3</b>}</button>)}</nav><div className="side-profile"><div className="avatar">KH</div><div><strong>Kevin Hinojosa</strong><span>{role} · Nivel {li+1}</span></div><ChevronRight/></div></aside><main className="main-area"><header className="topbar"><div className="mobile-brand"><div className="brand-mark"><Glasses/></div><strong>ACADEMIA OLA</strong></div><div className="breadcrumbs"><span>Formación interna</span><ChevronRight/><b>{navItems.find(n=>n.id===view)?.label}</b></div><div className="top-actions"><div className="coin-counter"><Coins/><strong>{coins}</strong><span>OLA Coins</span></div><button className="theme-toggle" onClick={()=>setDark(v=>!v)} aria-label="Cambiar tema">{dark?<Sun/>:<Moon/>}</button></div></header><div className="content">{view==="inicio"&&<Dashboard setView={setView} role={role} setRole={setRole} xp={xp} currentLevel={currentLevel} nextLevel={nextLevel} levelProgress={levelProgress} completion={completion} completed={completed} setSelectedModule={setSelectedModule} setQuizOpen={setQuizOpen}/>} {view==="academia"&&<Academy role={role} completed={completed} completion={completion} setSelectedModule={setSelectedModule} setQuizOpen={setQuizOpen}/>} {view==="retos"&&<Challenges riskCases={riskCases} riskRound={riskRound} riskScore={riskScore} riskFeedback={riskFeedback} chooseRisk={chooseRisk} nextRisk={nextRisk} setQuizOpen={setQuizOpen}/>} {view==="ranking"&&<Ranking xp={xp} coins={coins} filter={reportFilter} setFilter={setReportFilter} award={award}/>} {view==="ficha"&&<ReceptionForm form={form} setField={setField} risk={risk} checks={checks} setChecks={setChecks} allChecks={allChecks} signature={signature} setSignature={setSignature} photos={photos} handlePhotos={handlePhotos}/>}</div></main><nav className="mobile-nav">{navItems.map(i=><button key={i.id} className={view===i.id?"active":""} onClick={()=>setView(i.id)}><i.icon/><span>{i.label.replace(" digital","")}</span></button>)}</nav></div>{toast&&<div className="toast"><Sparkles/><span>{toast}</span></div>}
- <Dialog open={!!selectedModule} onOpenChange={o=>!o&&setSelectedModule(null)}><DialogContent className="module-dialog glass-modal">{selectedModule&&<><DialogHeader><div className={`module-hero ${selectedModule.color}`}><selectedModule.icon/><div><span>{selectedModule.eyebrow} · {selectedModule.duration}</span><DialogTitle>{selectedModule.title}</DialogTitle><DialogDescription>{selectedModule.description}</DialogDescription></div></div></DialogHeader>{selectedModule.id===2?<GlassesDiagram/>:selectedModule.id===3?<VideoLesson/>:<div className="lesson-body"><div className="lesson-visual"><div className="orbit o1"/><div className="orbit o2"/><selectedModule.icon/></div><div><h4>Idea esencial</h4><p>{selectedModule.id===1?"Una recepción correcta comienza antes de aceptar el armazón: revise, informe, registre y obtenga aceptación.":selectedModule.id===4?"Combine antigüedad, estado, reparaciones y dificultad del proceso para definir el riesgo.":selectedModule.id===5?"Explique el procedimiento sin culpar, minimizar ni prometer. Verifique que el cliente comprendió.":selectedModule.id===6?"Capture una toma frontal, dos laterales y un acercamiento de cada novedad.":selectedModule.id===7?"Complete todos los campos y lea las cláusulas antes de solicitar la firma.":"Los casos con fisuras, soldaduras, deformación severa o deterioro deben escalarse."}</p><div className="key-rule"><CheckCircle2/><span><strong>Regla de oro:</strong> una firma sin explicación no reemplaza una atención correcta.</span></div></div></div>}<div className="dialog-actions"><span><Zap/>Recompensa: {selectedModule.xp} XP</span><Button onClick={completeModule} className="primary-button"><Check/>Marcar como completado</Button></div></>}</DialogContent></Dialog>
- <Dialog open={quizOpen} onOpenChange={setQuizOpen}><DialogContent className="quiz-dialog glass-modal">{!quizDone?<><DialogHeader><div className="quiz-top"><span>Certificación final</span><b>{quizIndex+1} / {quiz.length}</b></div><Progress value={(quizIndex+1)/quiz.length*100}/><DialogTitle>{quiz[quizIndex].q}</DialogTitle></DialogHeader><div className="quiz-options">{quiz[quizIndex].options.map((o,i)=><button key={o} disabled={!!quizFeedback} className={quizFeedback?(i===quiz[quizIndex].answer?"correct":quizFeedback.ok?"muted":"wrong"):""} onClick={()=>answerQuiz(i)}><span>{String.fromCharCode(65+i)}</span>{o}{quizFeedback&&i===quiz[quizIndex].answer&&<CheckCircle2/>}</button>)}</div>{quizFeedback&&<div className={`feedback ${quizFeedback.ok?"success":"error"}`}>{quizFeedback.ok?<CheckCircle2/>:<XCircle/>}<div><strong>{quizFeedback.ok?"¡Respuesta correcta!":"Vamos a reforzarlo"}</strong><p>{quizFeedback.why}</p></div></div>}<div className="dialog-actions"><span>Puntaje: {quizScore}/{quizIndex+1}</span><Button disabled={!quizFeedback} onClick={nextQuiz} className="primary-button">{quizIndex===quiz.length-1?"Ver resultado":"Siguiente"}<MoveRight/></Button></div></>:<div className="result-card"><div className="result-ring"><Trophy/><strong>{Math.round(quizScore/quiz.length*100)}%</strong></div><h2>{quizScore>=6?"Certificación aprobada":"Necesita refuerzo"}</h2><p>{quizScore>=6?"Demostró dominio del protocolo de recepción segura.":"Revise los módulos y vuelva a intentarlo. La meta mínima es 80%."}</p><div className="score-row"><span>Respuestas correctas</span><strong>{quizScore} de {quiz.length}</strong></div><Button onClick={resetQuiz} className="primary-button"><RotateCcw/>Repetir evaluación</Button></div>}</DialogContent></Dialog>
- <AcademyEnhancements view={view} role={role} setRole={setRole} onAward={award}/>
- <PrintableReceipt form={form} risk={risk} checks={checks} signature={signature} photos={photos}/></>;
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  note,
+  tone = "cyan",
+}: {
+  icon: typeof Home;
+  label: string;
+  value: string;
+  note: string;
+  tone?: string;
+}) {
+  return (
+    <article className="glass-card stat-card">
+      <div className={`icon-orb ${tone}`}>
+        <Icon />
+      </div>
+      <div>
+        <p className="meta">{label}</p>
+        <strong>{value}</strong>
+        <span>{note}</span>
+      </div>
+    </article>
+  );
 }
 
-function Dashboard({setView,role,setRole,xp,currentLevel,nextLevel,levelProgress,completion,completed,setSelectedModule,setQuizOpen}:any){const L=currentLevel.icon;return <div className="page-stack"><section className="welcome-row"><div><span className="eyebrow">MIÉRCOLES · CONTINÚE SU RACHA</span><h1>Buenos días, Kevin <span>👋</span></h1><p>Hoy puede avanzar en <strong>Semáforo de riesgo</strong> y sumar 120 XP.</p></div><div className="role-switch"><button className={role==="Asesor"?"active":""} onClick={()=>setRole("Asesor")}>Asesor</button><button className={role==="Optómetra"?"active":""} onClick={()=>setRole("Optómetra")}>Optómetra</button></div></section><section className="stats-grid"><StatCard icon={Zap} label="PUNTOS TOTALES" value={`${xp.toLocaleString("es-EC")} XP`} note="+310 esta semana"/><StatCard icon={Flame} label="RACHA ACTUAL" value="7 días" note="Récord personal: 12" tone="orange"/><StatCard icon={Target} label="RUTA COMPLETADA" value={`${completion}%`} note={`${completed.length} de ${modules.length} módulos`} tone="violet"/><StatCard icon={Award} label="PRECISIÓN" value="92%" note="En evaluaciones" tone="blue"/></section><section className="dashboard-grid"><article className="glass-card level-card"><div className="level-head"><div className="level-badge"><L/></div><div><span>NIVEL {levels.indexOf(currentLevel)+1}</span><h2>{currentLevel.name}</h2></div><button onClick={()=>setView("ranking")}>Ver niveles<ChevronRight/></button></div><div className="level-progress"><div><span>{xp.toLocaleString("es-EC")} XP</span><span>{nextLevel.min.toLocaleString("es-EC")} XP</span></div><Progress value={levelProgress}/><p>Le faltan <strong>{Math.max(0,nextLevel.min-xp)} XP</strong> para convertirse en {nextLevel.name}.</p></div><div className="badge-row"><div className="mini-badge earned"><ShieldCheck/><span>Recepción segura</span></div><div className="mini-badge earned"><Camera/><span>Ojo clínico</span></div><div className="mini-badge locked"><LockKeyhole/><span>Riesgo cero</span></div></div></article><article className="glass-card weekly-card"><div className="card-title"><div><span>ACTIVIDAD</span><h3>XP esta semana</h3></div><strong>790 <small>XP</small></strong></div><div className="chart-medium"><ResponsiveContainer width="100%" height="100%"><BarChart data={weekly}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--grid)"/><XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill:"var(--muted-foreground)",fontSize:12}}/><Bar dataKey="xp" radius={[8,8,2,2]} fill="#24d5c4"/></BarChart></ResponsiveContainer></div></article></section><section className="section-head"><div><span>CONTINÚE APRENDIENDO</span><h2>Su ruta recomendada</h2></div><button onClick={()=>setView("academia")}>Ver ruta completa<ChevronRight/></button></section><section className="module-strip">{modules.slice(2,5).map((m:any,i:number)=><article key={m.id} className="glass-card module-card"><div className={`module-icon ${m.color}`}><m.icon/></div><div className="module-copy"><div><span>{m.eyebrow}</span><b>{m.role}</b></div><h3>{m.title}</h3><p>{m.description}</p><div className="module-meta"><span><Clock3/>{m.duration}</span><span><Zap/>{m.xp} XP</span></div></div><Button onClick={()=>setSelectedModule(m)} variant="outline">{i===0?"Continuar":"Iniciar"}<Play/></Button></article>)}</section><section className="action-banner"><div className="banner-icon"><GraduationCap/></div><div><span>CERTIFICACIÓN</span><h2>¿Domina el protocolo completo?</h2><p>8 preguntas · aprobación mínima 80% · hasta 240 XP</p></div><Button onClick={()=>setQuizOpen(true)} className="light-button">Iniciar evaluación<MoveRight/></Button></section></div>}
+function GlassesDiagram() {
+  return (
+    <div className="anatomy-card">
+      <svg viewBox="0 0 620 260" role="img" aria-label="Partes del armazón">
+        <defs>
+          <linearGradient id="fg" x1="0" x2="1">
+            <stop stopColor="#24d5c4" />
+            <stop offset="1" stopColor="#477dff" />
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="b" />
+            <feMerge>
+              <feMergeNode in="b" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <path
+          d="M72 121Q88 82 168 83Q246 86 250 132Q248 198 157 198Q79 197 72 121M548 121Q532 82 452 83Q374 86 370 132Q372 198 463 198Q541 197 548 121M250 123Q310 91 370 123M74 110L25 86M546 110L595 86"
+          fill="none"
+          stroke="url(#fg)"
+          strokeWidth="12"
+          strokeLinecap="round"
+          filter="url(#glow)"
+        />
+        <g className="diagram-labels">
+          <line x1="128" y1="84" x2="103" y2="40" />
+          <text x="58" y="30">
+            ARO
+          </text>
+          <line x1="310" y1="105" x2="310" y2="45" />
+          <text x="276" y="30">
+            PUENTE
+          </text>
+          <line x1="545" y1="104" x2="568" y2="52" />
+          <text x="532" y="36">
+            BISAGRA
+          </text>
+          <line x1="585" y1="88" x2="598" y2="155" />
+          <text x="510" y="181">
+            VARILLA
+          </text>
+          <line x1="25" y1="86" x2="20" y2="154" />
+          <text x="8" y="180">
+            TERMINAL
+          </text>
+          <circle cx="280" cy="133" r="8" />
+          <line x1="280" y1="141" x2="260" y2="219" />
+          <text x="205" y="242">
+            PLAQUETA
+          </text>
+        </g>
+      </svg>
+      <p>Confirme integridad, simetría, movimiento y señales de reparación.</p>
+    </div>
+  );
+}
 
-function Academy({role,completed,completion,setSelectedModule,setQuizOpen}:any){return <div className="page-stack"><section className="page-header"><div><span className="eyebrow">RUTA DE FORMACIÓN</span><h1>Academia de Recepción Segura</h1><p>Contenido breve, visual y aplicable durante la atención diaria.</p></div><div className="completion-ring"><div style={{"--p":`${completion*3.6}deg`} as React.CSSProperties}><strong>{completion}%</strong><span>completado</span></div></div></section><section className="learning-path"><div className="path-line"/>{modules.map((m:any,i:number)=>{const done=completed.includes(m.id),available=i===0||completed.includes(modules[i-1].id);return <article className={`glass-card path-module ${done?"done":""} ${!available?"locked":""}`} key={m.id}><div className={`path-node ${done?"done":""}`}>{done?<Check/>:<span>{i+1}</span>}</div><div className={`module-icon ${m.color}`}><m.icon/></div><div className="path-content"><div><span>{m.eyebrow}</span><b className={m.role===role||m.role==="Todos"?"role-match":""}>{m.role}</b></div><h3>{m.title}</h3><p>{m.description}</p><div className="module-meta"><span><Clock3/>{m.duration}</span><span><Zap/>{m.xp} XP</span></div></div><Button disabled={!available} variant={done?"outline":"default"} onClick={()=>setSelectedModule(m)}>{done?"Repasar":available?"Comenzar":"Bloqueado"}{available&&!done?<Play/>:<ChevronRight/>}</Button></article>})}</section><section className="certification-card glass-card"><div className="cert-seal"><Medal/></div><div><span>CERTIFICACIÓN OLA</span><h2>Recepción Segura de Armazones</h2><p>Complete la ruta y obtenga mínimo 80% en la evaluación final.</p></div><Button onClick={()=>setQuizOpen(true)} className="primary-button">Presentar evaluación<MoveRight/></Button></section></div>}
+function VideoLesson() {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(
+    () => () => {
+      if (url) URL.revokeObjectURL(url);
+    },
+    [url],
+  );
+  return (
+    <div className="video-lesson">
+      {url ? (
+        <video src={url} controls autoPlay className="training-video" />
+      ) : (
+        <div className="video-placeholder">
+          <div className="heat-demo">
+            <div className="lens left" />
+            <div className="lens right" />
+            <div className="bridge" />
+            <span className="heat h1">≈</span>
+            <span className="heat h2">≈</span>
+            <span className="heat h3">≈</span>
+          </div>
+          <div>
+            <span className="pill">
+              <PlayCircle />
+              Microclase visual
+            </span>
+            <h4>Calor controlado y tensión del material</h4>
+            <p>
+              Animación demostrativa. También puede cargar un video interno.
+            </p>
+          </div>
+        </div>
+      )}
+      <label className="upload-video">
+        <Upload />
+        {url ? "Cambiar video" : "Cargar video interno"}
+        <input
+          type="file"
+          accept="video/*"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) setUrl(URL.createObjectURL(f));
+          }}
+        />
+      </label>
+    </div>
+  );
+}
 
-function Challenges({riskCases,riskRound,riskScore,riskFeedback,chooseRisk,nextRisk,setQuizOpen}:any){const item=riskCases[riskRound];return <div className="page-stack"><section className="page-header"><div><span className="eyebrow">PRÁCTICA GAMIFICADA</span><h1>Retos de hoy</h1><p>Entrene decisiones reales, gane puntos y fortalezca su criterio.</p></div><div className="streak-pill"><Flame/><strong>7</strong><span>días de racha</span></div></section><section className="challenge-grid"><article className="glass-card risk-game"><div className="game-head"><div className="game-icon"><ScanSearch/></div><div><span>LABORATORIO DE RIESGO</span><h2>Clasifique el caso</h2></div><b>{riskRound+1}/{riskCases.length}</b></div><div className="case-visual"><div className="case-frame"><div/><div/><span/></div><div><span>CASO {String(riskRound+1).padStart(2,"0")}</span><h3>{item.title}</h3><p>Seleccione el nivel que corresponde según el protocolo.</p></div></div><div className="risk-buttons"><button disabled={!!riskFeedback} onClick={()=>chooseRisk("Bajo")} className="low"><span/>Riesgo bajo</button><button disabled={!!riskFeedback} onClick={()=>chooseRisk("Medio")} className="medium"><span/>Riesgo medio</button><button disabled={!!riskFeedback} onClick={()=>chooseRisk("Alto")} className="high"><span/>Riesgo alto</button></div>{riskFeedback&&<div className="feedback success"><CheckCircle2/><div><strong>Retroalimentación</strong><p>{riskFeedback}</p></div><Button onClick={nextRisk}>Siguiente<MoveRight/></Button></div>}<div className="game-footer"><span><Target/>Aciertos: {riskScore}</span><span><Zap/>Hasta 140 XP</span></div></article><div className="side-challenges"><article className="glass-card mini-challenge"><div className="challenge-top"><div className="icon-orb violet"><Timer/></div><span>+80 XP</span></div><h3>Trivia relámpago</h3><p>8 preguntas para resolver en una sola ronda.</p><div className="mini-stats"><span>⏱ 5 min</span><span>🎯 80% meta</span></div><Button onClick={()=>setQuizOpen(true)} variant="outline">Jugar ahora<Play/></Button></article><article className="glass-card daily-card"><span>RETO DIARIO</span><h3>Detecte 4 novedades</h3><p>Observe las fotografías del caso y seleccione los puntos que deben registrarse.</p><div className="photo-triptych"><img src="/training/caso-frontal.jpg" alt="Vista frontal de un armazón de práctica"/><img src="/training/caso-lateral-derecho.jpg" alt="Vista lateral derecha"/><img src="/training/caso-lateral-izquierdo.jpg" alt="Vista lateral izquierda"/></div><Button variant="outline">Abrir caso<ImageIcon/></Button></article></div></section><section className="xp-rules glass-card"><div><span>SISTEMA DE PUNTOS</span><h2>Cada acción correcta suma</h2></div><div className="rule-grid"><div><PlayCircle/><span>Microclase</span><strong>+50 XP</strong></div><div><ClipboardCheck/><span>Evaluación ≥80%</span><strong>+180 XP</strong></div><div><Star/><span>Puntaje perfecto</span><strong>+60 XP</strong></div><div><Flame/><span>Racha semanal</span><strong>+100 XP</strong></div><div><Camera/><span>Reto práctico</span><strong>+90 XP</strong></div></div></section></div>}
+function SignaturePad({ onChange }: { onChange: (v: string) => void }) {
+  const ref = useRef<HTMLCanvasElement>(null),
+    drawing = useRef(false);
+  const point = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const c = ref.current!,
+      r = c.getBoundingClientRect();
+    return {
+      x: (e.clientX - r.left) * (c.width / r.width),
+      y: (e.clientY - r.top) * (c.height / r.height),
+    };
+  };
+  const start = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    drawing.current = true;
+    const p = point(e),
+      c = ref.current!;
+    c.getContext("2d")!.beginPath();
+    c.getContext("2d")!.moveTo(p.x, p.y);
+    c.setPointerCapture(e.pointerId);
+  };
+  const move = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!drawing.current) return;
+    const p = point(e),
+      c = ref.current!,
+      x = c.getContext("2d")!;
+    x.lineWidth = 3;
+    x.lineCap = "round";
+    x.strokeStyle = "#1675ff";
+    x.lineTo(p.x, p.y);
+    x.stroke();
+  };
+  const stop = () => {
+    if (!drawing.current) return;
+    drawing.current = false;
+    onChange(ref.current!.toDataURL());
+  };
+  const clear = () => {
+    const c = ref.current!;
+    c.getContext("2d")!.clearRect(0, 0, c.width, c.height);
+    onChange("");
+  };
+  return (
+    <div className="signature-wrap">
+      <canvas
+        ref={ref}
+        width={700}
+        height={190}
+        onPointerDown={start}
+        onPointerMove={move}
+        onPointerUp={stop}
+        onPointerCancel={stop}
+      />
+      <button type="button" onClick={clear}>
+        <RotateCcw />
+        Limpiar firma
+      </button>
+    </div>
+  );
+}
 
-function Ranking({xp,coins,filter,setFilter,award}:any){const filtered=filter==="Todos"?leaderboard:leaderboard.filter(x=>x.role===filter);return <div className="page-stack"><section className="page-header"><div><span className="eyebrow">RECONOCIMIENTO Y MÉTRICAS</span><h1>Ranking Academia OLA</h1><p>El puntaje reconoce constancia, conocimiento y aplicación correcta.</p></div><div className="filter-pills">{["Todos","Asesor","Optómetra"].map(f=><button className={filter===f?"active":""} onClick={()=>setFilter(f)} key={f}>{f}</button>)}</div></section><section className="ranking-layout"><article className="glass-card leaderboard"><div className="card-title"><div><span>CLASIFICACIÓN MENSUAL</span><h3>Mejores puntajes</h3></div><Trophy/></div><div className="podium"><div className="podium-person second"><div>AM</div><Medal/><strong>Andrés</strong><span>3.650 XP</span></div><div className="podium-person first"><div>MF</div><Trophy/><strong>María F.</strong><span>3.840 XP</span></div><div className="podium-person third"><div>GG</div><Award/><strong>Gema</strong><span>3.410 XP</span></div></div><div className="rank-list">{filtered.map(p=><div key={p.rank} className="rank-row"><strong className="rank-num">{p.rank}</strong><div className="rank-avatar">{p.name.split(" ").map(x=>x[0]).slice(0,2).join("")}</div><div className="rank-name"><strong>{p.name}</strong><span>{p.role} · {p.store}</span></div><span className="accuracy">{p.accuracy}% precisión</span><span className="rank-streak"><Flame/>{p.streak}</span><b>{p.xp.toLocaleString("es-EC")} XP</b></div>)}</div><div className="your-rank"><span>#12</span><div><strong>Kevin Hinojosa</strong><p>Subió 4 posiciones esta semana</p></div><b>{xp.toLocaleString("es-EC")} XP</b></div></article><div className="analytics-column"><article className="glass-card mastery"><div className="card-title"><div><span>DOMINIO</span><h3>Habilidades evaluadas</h3></div><BarChart3/></div><div className="chart-radar"><ResponsiveContainer width="100%" height="100%"><RadarChart data={mastery}><PolarGrid stroke="var(--grid)"/><PolarAngleAxis dataKey="skill" tick={{fill:"var(--muted-foreground)",fontSize:11}}/><Radar dataKey="value" stroke="#477dff" fill="#477dff" fillOpacity={.28}/></RadarChart></ResponsiveContainer></div></article><article className="glass-card quality-card"><div className="donut-wrap"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={riskData} innerRadius={48} outerRadius={68} paddingAngle={4} dataKey="value">{riskData.map(d=><Cell key={d.name} fill={d.color}/>)}</Pie></PieChart></ResponsiveContainer><div><strong>84%</strong><span>dominio</span></div></div><div><span>CRITERIO DE RIESGO</span><h3>Resultado del equipo</h3><p>16% requiere refuerzo dirigido.</p></div></article></div></section><section><div className="section-head"><div><span>CATÁLOGO PROPUESTO</span><h2>Premios por OLA Coins</h2></div><div className="wallet"><Coins/>{coins} disponibles</div></div><div className="reward-grid">{rewards.map(r=><article className="glass-card reward-card" key={r.name}><div className="reward-art"><r.icon/><span>{r.tag}</span></div><h3>{r.name}</h3><p>Reconocimiento sujeto a validación y disponibilidad de la política interna OLA.</p><Button disabled={coins<r.coins} variant="outline" onClick={()=>award("Premio reservado",0,-r.coins)}><Coins/>{r.coins} · {coins>=r.coins?"Canjear":"Bloqueado"}</Button></article>)}</div></section><section className="admin-note"><AlertTriangle/><p><strong>Importante:</strong> premios, equivalencias y periodicidad son una propuesta configurable y deben aprobarse internamente.</p></section></div>}
+export default function HomePage() {
+  const [view, setView] = useState<View>("inicio"),
+    [dark, setDark] = useState(true),
+    [role, setRole] = useState<Role>("Asesor"),
+    [xp, setXp] = useState(760),
+    [coins, setCoins] = useState(420),
+    [completed, setCompleted] = useState<number[]>([1, 2]);
+  const [selectedModule, setSelectedModule] = useState<
+      (typeof modules)[number] | null
+    >(null),
+    [quizOpen, setQuizOpen] = useState(false),
+    [quizIndex, setQuizIndex] = useState(0),
+    [quizScore, setQuizScore] = useState(0),
+    [quizFeedback, setQuizFeedback] = useState<{
+      ok: boolean;
+      why: string;
+    } | null>(null),
+    [quizDone, setQuizDone] = useState(false);
+  const [riskRound, setRiskRound] = useState(0),
+    [riskScore, setRiskScore] = useState(0),
+    [riskFeedback, setRiskFeedback] = useState<string | null>(null),
+    [reportFilter, setReportFilter] = useState("Todos"),
+    [toast, setToast] = useState<string | null>(null),
+    [signature, setSignature] = useState(""),
+    [photos, setPhotos] = useState<string[]>([]),
+    [risk, setRisk] = useState<"Bajo" | "Medio" | "Alto">("Bajo");
+  const [form, setForm] = useState<Record<string, string>>({
+    date: new Date().toISOString().slice(0, 10),
+    frameMaterial: "Metal",
+    frameType: "Completo",
+    lensType: "Monofocal",
+    purchasePlace: "Óptica Los Andes",
+    age: "Menos de 1 año",
+  });
+  const [checks, setChecks] = useState<Record<string, boolean>>({
+    reviewed: false,
+    shown: false,
+    manipulation: false,
+    heat: false,
+    age: false,
+    risks: false,
+    questions: false,
+  });
+  useEffect(() => {
+    const saved = localStorage.getItem("ola-academy-state");
+    if (saved)
+      try {
+        const s = JSON.parse(saved);
+        setXp(s.xp ?? 760);
+        setCoins(s.coins ?? 420);
+        setCompleted(s.completed ?? [1, 2]);
+        setRole(s.role ?? "Asesor");
+      } catch {}
+    const t = localStorage.getItem("ola-theme"),
+      d = t !== "light";
+    setDark(d);
+    document.documentElement.classList.toggle("dark", d);
+  }, []);
+  useEffect(() => {
+    localStorage.setItem(
+      "ola-academy-state",
+      JSON.stringify({ xp, coins, completed, role }),
+    );
+  }, [xp, coins, completed, role]);
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("ola-theme", dark ? "dark" : "light");
+  }, [dark]);
+  useEffect(() => {
+    if (toast) {
+      const t = setTimeout(() => setToast(null), 2800);
+      return () => clearTimeout(t);
+    }
+  }, [toast]);
+  const li = Math.max(
+      0,
+      levels.findIndex((l) => xp >= l.min && xp <= l.max),
+    ),
+    currentLevel = levels[li],
+    nextLevel = levels[Math.min(levels.length - 1, li + 1)],
+    levelProgress =
+      currentLevel === nextLevel
+        ? 100
+        : Math.round(
+            ((xp - currentLevel.min) / (nextLevel.min - currentLevel.min)) *
+              100,
+          ),
+    completion = Math.round((completed.length / modules.length) * 100),
+    allChecks = Object.values(checks).every(Boolean);
+  const riskCases = [
+    {
+      title: "Armazón de 4 meses, sin daños y sin reparaciones",
+      answer: "Bajo",
+      detail: "Buen estado, poca antigüedad y sin señales preexistentes.",
+    },
+    {
+      title: "Armazón de 2 años, tornillo flojo y ligera deformación",
+      answer: "Medio",
+      detail: "Debe documentarse y explicarse antes de continuar.",
+    },
+    {
+      title: "Armazón de 3 años con fisura y soldadura anterior",
+      answer: "Alto",
+      detail: "Requiere evidencia y escalamiento para validación.",
+    },
+  ];
+  const award = (m: string, x: number, c: number) => {
+    setXp((v) => v + x);
+    setCoins((v) => v + c);
+    setToast(
+      `${m} · ${x >= 0 ? "+" : ""}${x} XP · ${c >= 0 ? "+" : ""}${c} SAC Coins`,
+    );
+  };
+  const completeModule = () => {
+    if (!selectedModule) return;
+    if (!completed.includes(selectedModule.id)) {
+      setCompleted((v) => [...v, selectedModule.id]);
+      award(
+        "Módulo completado",
+        selectedModule.xp,
+        Math.round(selectedModule.xp / 4),
+      );
+    }
+    setSelectedModule(null);
+  };
+  const answerQuiz = (i: number) => {
+    if (quizFeedback) return;
+    const q = quiz[quizIndex],
+      ok = i === q.answer;
+    if (ok) setQuizScore((v) => v + 1);
+    setQuizFeedback({ ok, why: q.why });
+  };
+  const nextQuiz = () => {
+    if (quizIndex === quiz.length - 1) {
+      setQuizDone(true);
+      const f = quizScore;
+      if (f >= 6)
+        award("Certificación aprobada", f === 8 ? 240 : 180, f === 8 ? 80 : 50);
+    } else {
+      setQuizIndex((v) => v + 1);
+      setQuizFeedback(null);
+    }
+  };
+  const resetQuiz = () => {
+    setQuizIndex(0);
+    setQuizScore(0);
+    setQuizFeedback(null);
+    setQuizDone(false);
+  };
+  const chooseRisk = (choice: string) => {
+    if (riskFeedback) return;
+    const i = riskCases[riskRound],
+      ok = choice === i.answer;
+    if (ok) setRiskScore((v) => v + 1);
+    setRiskFeedback(
+      ok
+        ? `Correcto. ${i.detail}`
+        : `La clasificación correcta es ${i.answer}. ${i.detail}`,
+    );
+  };
+  const nextRisk = () => {
+    if (riskRound === riskCases.length - 1) {
+      award(
+        "Laboratorio de riesgo completado",
+        riskScore === 3 ? 140 : 90,
+        riskScore === 3 ? 45 : 25,
+      );
+      setRiskRound(0);
+      setRiskScore(0);
+      setRiskFeedback(null);
+    } else {
+      setRiskRound((v) => v + 1);
+      setRiskFeedback(null);
+    }
+  };
+  const setField = (k: string, v: string) => setForm((s) => ({ ...s, [k]: v }));
+  useEffect(() => {
+    const t =
+      `${form.frameState ?? ""} ${form.lensState ?? ""} ${form.repairs ?? ""}`.toLowerCase();
+    if (/fisur|triz|rot|sold|quebrad/.test(t) || form.age === "Más de 2 años")
+      setRisk("Alto");
+    else if (/ray|desgast|flojo|deform/.test(t) || form.age === "1 a 2 años")
+      setRisk("Medio");
+    else setRisk("Bajo");
+  }, [form.frameState, form.lensState, form.repairs, form.age]);
+  const handlePhotos = (files: FileList | null) => {
+    if (files)
+      setPhotos(Array.from(files).slice(0, 4).map(URL.createObjectURL));
+  };
+  return (
+    <>
+      <div className="site-shell app-screen">
+        <aside className="sidebar glass-panel">
+          <div className="brand">
+            <div className="brand-mark">
+              <Glasses />
+            </div>
+            <div>
+              <strong>ACADEMIA SAC</strong>
+              <span>Servicio al Cliente</span>
+            </div>
+          </div>
+          <nav>
+            {navItems.map((i) => (
+              <button
+                key={i.id}
+                onClick={() => setView(i.id)}
+                className={view === i.id ? "active" : ""}
+              >
+                <i.icon />
+                <span>{i.label}</span>
+                {i.id === "retos" && <b>3</b>}
+              </button>
+            ))}
+          </nav>
+          <div className="side-profile">
+            <div className="avatar">KH</div>
+            <div>
+              <strong>Kevin Hinojosa</strong>
+              <span>
+                {role} · Nivel {li + 1}
+              </span>
+            </div>
+            <ChevronRight />
+          </div>
+        </aside>
+        <main className="main-area">
+          <header className="topbar">
+            <div className="mobile-brand">
+              <div className="brand-mark">
+                <Glasses />
+              </div>
+              <strong>ACADEMIA SAC</strong>
+            </div>
+            <div className="breadcrumbs">
+              <span>Formación interna</span>
+              <ChevronRight />
+              <b>{navItems.find((n) => n.id === view)?.label}</b>
+            </div>
+            <div className="top-actions">
+              <div className="coin-counter">
+                <Coins />
+                <strong>{coins}</strong>
+                <span>SAC Coins</span>
+              </div>
+              <button
+                className="theme-toggle"
+                onClick={() => setDark((v) => !v)}
+                aria-label="Cambiar tema"
+              >
+                {dark ? <Sun /> : <Moon />}
+              </button>
+            </div>
+          </header>
+          <div className="content">
+            {view === "inicio" && (
+              <Dashboard
+                setView={setView}
+                role={role}
+                setRole={setRole}
+                xp={xp}
+                currentLevel={currentLevel}
+                nextLevel={nextLevel}
+                levelProgress={levelProgress}
+                completion={completion}
+                completed={completed}
+                setSelectedModule={setSelectedModule}
+                setQuizOpen={setQuizOpen}
+              />
+            )}{" "}
+            {view === "academia" && (
+              <Academy
+                role={role}
+                completed={completed}
+                completion={completion}
+                setSelectedModule={setSelectedModule}
+                setQuizOpen={setQuizOpen}
+              />
+            )}{" "}
+            {view === "retos" && (
+              <Challenges
+                riskCases={riskCases}
+                riskRound={riskRound}
+                riskScore={riskScore}
+                riskFeedback={riskFeedback}
+                chooseRisk={chooseRisk}
+                nextRisk={nextRisk}
+                setQuizOpen={setQuizOpen}
+              />
+            )}{" "}
+            {view === "ranking" && (
+              <Ranking
+                xp={xp}
+                coins={coins}
+                filter={reportFilter}
+                setFilter={setReportFilter}
+                award={award}
+              />
+            )}{" "}
+            {view === "ficha" && (
+              <ReceptionForm
+                form={form}
+                setField={setField}
+                risk={risk}
+                checks={checks}
+                setChecks={setChecks}
+                allChecks={allChecks}
+                signature={signature}
+                setSignature={setSignature}
+                photos={photos}
+                handlePhotos={handlePhotos}
+              />
+            )}
+          </div>
+        </main>
+        <nav className="mobile-nav">
+          {navItems.map((i) => (
+            <button
+              key={i.id}
+              className={view === i.id ? "active" : ""}
+              onClick={() => setView(i.id)}
+            >
+              <i.icon />
+              <span>{i.label.replace(" digital", "")}</span>
+            </button>
+          ))}
+        </nav>
+      </div>
+      {toast && (
+        <div className="toast">
+          <Sparkles />
+          <span>{toast}</span>
+        </div>
+      )}
+      <Dialog
+        open={!!selectedModule}
+        onOpenChange={(o) => !o && setSelectedModule(null)}
+      >
+        <DialogContent className="module-dialog glass-modal">
+          {selectedModule && (
+            <>
+              <DialogHeader>
+                <div className={`module-hero ${selectedModule.color}`}>
+                  <selectedModule.icon />
+                  <div>
+                    <span>
+                      {selectedModule.eyebrow} · {selectedModule.duration}
+                    </span>
+                    <DialogTitle>{selectedModule.title}</DialogTitle>
+                    <DialogDescription>
+                      {selectedModule.description}
+                    </DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
+              {selectedModule.id === 2 ? (
+                <GlassesDiagram />
+              ) : selectedModule.id === 3 ? (
+                <VideoLesson />
+              ) : (
+                <div className="lesson-body">
+                  <div className="lesson-visual">
+                    <div className="orbit o1" />
+                    <div className="orbit o2" />
+                    <selectedModule.icon />
+                  </div>
+                  <div>
+                    <h4>Idea esencial</h4>
+                    <p>
+                      {selectedModule.id === 1
+                        ? "Una recepción correcta comienza antes de aceptar el armazón: revise, informe, registre y obtenga aceptación."
+                        : selectedModule.id === 4
+                          ? "Combine antigüedad, estado, reparaciones y dificultad del proceso para definir el riesgo."
+                          : selectedModule.id === 5
+                            ? "Explique el procedimiento sin culpar, minimizar ni prometer. Verifique que el cliente comprendió."
+                            : selectedModule.id === 6
+                              ? "Capture una toma frontal, dos laterales y un acercamiento de cada novedad."
+                              : selectedModule.id === 7
+                                ? "Complete todos los campos y lea las cláusulas antes de solicitar la firma."
+                                : "Los casos con fisuras, soldaduras, deformación severa o deterioro deben escalarse."}
+                    </p>
+                    <div className="key-rule">
+                      <CheckCircle2 />
+                      <span>
+                        <strong>Regla de oro:</strong> una firma sin explicación
+                        no reemplaza una atención correcta.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div className="dialog-actions">
+                <span>
+                  <Zap />
+                  Recompensa: {selectedModule.xp} XP
+                </span>
+                <Button onClick={completeModule} className="primary-button">
+                  <Check />
+                  Marcar como completado
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+      <Dialog open={quizOpen} onOpenChange={setQuizOpen}>
+        <DialogContent className="quiz-dialog glass-modal">
+          {!quizDone ? (
+            <>
+              <DialogHeader>
+                <div className="quiz-top">
+                  <span>Certificación final</span>
+                  <b>
+                    {quizIndex + 1} / {quiz.length}
+                  </b>
+                </div>
+                <Progress value={((quizIndex + 1) / quiz.length) * 100} />
+                <DialogTitle>{quiz[quizIndex].q}</DialogTitle>
+              </DialogHeader>
+              <div className="quiz-options">
+                {quiz[quizIndex].options.map((o, i) => (
+                  <button
+                    key={o}
+                    disabled={!!quizFeedback}
+                    className={
+                      quizFeedback
+                        ? i === quiz[quizIndex].answer
+                          ? "correct"
+                          : quizFeedback.ok
+                            ? "muted"
+                            : "wrong"
+                        : ""
+                    }
+                    onClick={() => answerQuiz(i)}
+                  >
+                    <span>{String.fromCharCode(65 + i)}</span>
+                    {o}
+                    {quizFeedback && i === quiz[quizIndex].answer && (
+                      <CheckCircle2 />
+                    )}
+                  </button>
+                ))}
+              </div>
+              {quizFeedback && (
+                <div
+                  className={`feedback ${quizFeedback.ok ? "success" : "error"}`}
+                >
+                  {quizFeedback.ok ? <CheckCircle2 /> : <XCircle />}
+                  <div>
+                    <strong>
+                      {quizFeedback.ok
+                        ? "¡Respuesta correcta!"
+                        : "Vamos a reforzarlo"}
+                    </strong>
+                    <p>{quizFeedback.why}</p>
+                  </div>
+                </div>
+              )}
+              <div className="dialog-actions">
+                <span>
+                  Puntaje: {quizScore}/{quizIndex + 1}
+                </span>
+                <Button
+                  disabled={!quizFeedback}
+                  onClick={nextQuiz}
+                  className="primary-button"
+                >
+                  {quizIndex === quiz.length - 1
+                    ? "Ver resultado"
+                    : "Siguiente"}
+                  <MoveRight />
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="result-card">
+              <div className="result-ring">
+                <Trophy />
+                <strong>{Math.round((quizScore / quiz.length) * 100)}%</strong>
+              </div>
+              <h2>
+                {quizScore >= 6
+                  ? "Certificación aprobada"
+                  : "Necesita refuerzo"}
+              </h2>
+              <p>
+                {quizScore >= 6
+                  ? "Demostró dominio del protocolo de recepción segura."
+                  : "Revise los módulos y vuelva a intentarlo. La meta mínima es 80%."}
+              </p>
+              <div className="score-row">
+                <span>Respuestas correctas</span>
+                <strong>
+                  {quizScore} de {quiz.length}
+                </strong>
+              </div>
+              <Button onClick={resetQuiz} className="primary-button">
+                <RotateCcw />
+                Repetir evaluación
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      <AcademyEnhancements
+        view={view}
+        role={role}
+        setRole={setRole}
+        onAward={award}
+      />
+      <PrintableReceipt
+        form={form}
+        risk={risk}
+        checks={checks}
+        signature={signature}
+        photos={photos}
+      />
+    </>
+  );
+}
 
-function ReceptionForm({form,setField,risk,checks,setChecks,allChecks,signature,setSignature,photos,handlePhotos}:any){const F=({label,name,type="text",placeholder=""}:any)=><label className="field"><span>{label}</span><Input type={type} value={form[name]??""} onChange={e=>setField(name,e.target.value)} placeholder={placeholder}/></label>,S=({label,name,options}:any)=><label className="field"><span>{label}</span><select value={form[name]??options[0]} onChange={e=>setField(name,e.target.value)}>{options.map((o:string)=><option key={o}>{o}</option>)}</select></label>;return <div className="page-stack"><section className="page-header form-header"><div><span className="eyebrow">HERRAMIENTA OPERATIVA</span><h1>Ficha digital de recepción</h1><p>Basada en el formulario entregado. Complete, explique, firme e imprima.</p></div><div className={`risk-status ${risk.toLowerCase()}`}><span/><div><small>RIESGO CALCULADO</small><strong>{risk}</strong></div></div></section><div className="form-layout"><form className="glass-card reception-form" onSubmit={e=>{e.preventDefault();window.print()}}><FormSection n="01" title="Datos de recepción" desc="Información general del ingreso."><div className="field-grid"><F label="Fecha de recepción" name="date" type="date"/><F label="Local" name="store" placeholder="Ej. Mall del Pacífico"/><F label="Número de OT / arreglo" name="ot"/><F label="Asesor responsable" name="advisor"/><F label="Optómetra responsable" name="optometrist"/></div></FormSection><FormSection n="02" title="Armazón y lunas" desc="Registre cada componente y su condición real."><div className="field-grid"><S label="Material del armazón" name="frameMaterial" options={["Metal","Acetato","Nylon","Mixto","Otro"]}/><F label="Marca y código" name="brand"/><S label="Tipo de armazón" name="frameType" options={["Completo","Semi al aire","Al aire","Gafa"]}/><F label="Plaquetas / estado" name="pads" placeholder="Ej. 2, desgastadas"/><F label="Terminales / estado" name="temples"/><F label="Accesorios: brillos, logos, emblemas" name="accessories"/><S label="Cuadrado" name="squared" options={["No","Sí"]}/><F label="Número de lunas" name="lenses" type="number"/><S label="Medida" name="measure" options={["Sí","No","No aplica"]}/><S label="Transitions" name="transitions" options={["No","Sí"]}/><S label="Tipo de luna" name="lensType" options={["Monofocal","Progresiva","Bifocal","Sin lunas","Otra"]}/><F label="Estado del flex de la montura" name="flex"/></div></FormSection><FormSection n="03" title="Estado y antecedentes" desc="Describa sin minimizar ninguna novedad."><div className="field-grid"><label className="field full"><span>Estado del armazón</span><Textarea value={form.frameState??""} onChange={e=>setField("frameState",e.target.value)} placeholder="Rayado, deformado, fisurado, desgastado…"/></label><label className="field full"><span>Estado de las lunas</span><Textarea value={form.lensState??""} onChange={e=>setField("lensState",e.target.value)} placeholder="Rayadas, capa AR desprendida, trizadas…"/></label><S label="Dónde compró armazón / lunas / gafas" name="purchasePlace" options={["Óptica Los Andes","Otro establecimiento","No recuerda"]}/><S label="Tiempo de uso / fecha de compra" name="age" options={["Menos de 1 año","1 a 2 años","Más de 2 años","Cliente desconoce"]}/><F label="Reparaciones anteriores" name="repairs" placeholder="Soldaduras, cambios, pegamentos…"/><label className="field full"><span>Observaciones</span><Textarea value={form.observations??""} onChange={e=>setField("observations",e.target.value)}/></label></div></FormSection><FormSection n="04" title="Cliente y evidencia" desc="Adjunte fotografías claras del estado recibido."><div className="field-grid"><F label="Nombre del cliente" name="client"/><F label="Cédula / RUC" name="id"/><F label="Número de teléfono" name="phone" type="tel"/><F label="Email para notificación" name="email" type="email"/></div><label className="photo-uploader"><Camera/><div><strong>Frontal, lateral 1, lateral 2 y detalle</strong><span>JPG o PNG · máximo 4 fotografías</span></div><b>Seleccionar</b><input type="file" accept="image/*" multiple onChange={e=>handlePhotos(e.target.files)}/></label>{photos.length>0&&<div className="photo-previews">{photos.map((p:string,i:number)=><img key={p} src={p} alt={`Evidencia ${i+1}`}/>)}</div>}</FormSection><FormSection n="05" title="Explicación obligatoria" desc="Confirme cada punto antes de solicitar la firma."><div className="clause-box"><ShieldCheck/><div><strong>Información del formulario</strong><p>En caso de que los productos del cliente requieran manipulación para traspaso o montaje de lunas, ajuste, cuadre, arreglo o soldadura, Óptica Los Andes realizará el trabajo con el cuidado adecuado; sin embargo, estos procesos involucran un riesgo que debe explicarse al cliente.</p><p>Los armazones y lunas dejados en los puntos de venta por más de 90 días se sujetan a la cláusula del formulario de recepción.</p></div></div><div className="check-list">{[["reviewed","Se revisó el estado general junto con el cliente."],["shown","Se mostraron las novedades visibles identificadas."],["manipulation","Se explicó que el armazón será manipulado durante el proceso."],["heat","Se explicó que, según material y condición, puede requerir calor controlado."],["age","Se informó cómo la antigüedad y el desgaste afectan la resistencia."],["risks","Se explicaron posibles fisuras, trizaduras, deformación o rotura."],["questions","El cliente pudo realizar preguntas y confirmó su comprensión."]].map(([k,t])=><label key={k}><Switch checked={checks[k]} onCheckedChange={v=>setChecks((c:any)=>({...c,[k]:v}))}/><span>{t}</span></label>)}</div></FormSection><FormSection n="06" title="Firma de aceptación" desc="Solicite la firma únicamente después de la explicación."><SignaturePad onChange={setSignature}/><div className="form-final"><div className={`validation ${allChecks&&signature?"ready":"pending"}`}>{allChecks&&signature?<CheckCircle2/>:<AlertTriangle/>}<div><strong>{allChecks&&signature?"Ficha lista para generar":"Complete los requisitos"}</strong><span>{!allChecks?"Faltan confirmaciones obligatorias.":!signature?"Falta la firma del cliente.":"Puede imprimir o guardar como PDF."}</span></div></div><Button type="submit" disabled={!allChecks||!signature||(risk==="Alto"&&!form.escalation)} className="primary-button"><Printer/>Imprimir / Guardar PDF</Button></div>{risk==="Alto"&&<label className="escalation"><AlertTriangle/><div><strong>Riesgo alto: validación requerida</strong><span>Registre quién autoriza continuar.</span></div><Input value={form.escalation??""} onChange={e=>setField("escalation",e.target.value)} placeholder="Responsable de validación"/></label>}</FormSection></form><aside className="form-assistant"><article className="glass-card"><div className="assistant-head"><Sparkles/><div><span>ASISTENTE DE RECEPCIÓN</span><h3>Cómo explicarlo</h3></div></div><p>“Antes de recibir su armazón vamos a revisar su estado. Durante el montaje es necesario manipularlo y, dependiendo de su material y condición, pueden realizarse ajustes o aplicarse calor controlado.”</p><button onClick={()=>navigator.clipboard?.writeText("Antes de recibir su armazón vamos a revisar su estado. Durante el montaje es necesario manipularlo y, dependiendo de su material y condición, pueden realizarse ajustes o aplicarse calor controlado.")}>Copiar explicación</button></article><article className="glass-card risk-guide"><span>SEMÁFORO</span><h3>Qué hacer ahora</h3><div className={risk==="Bajo"?"active":""}><i className="low"/><p><strong>Bajo</strong>Puede continuar siguiendo el protocolo.</p></div><div className={risk==="Medio"?"active":""}><i className="medium"/><p><strong>Medio</strong>Explique y documente cada novedad.</p></div><div className={risk==="Alto"?"active":""}><i className="high"/><p><strong>Alto</strong>Escalone para validación antes de continuar.</p></div></article><article className="glass-card process-card"><span>PROGRESO</span><h3>Recepción correcta</h3>{["Datos","Armazón","Estado","Evidencia","Explicación","Firma"].map((x,i)=><div key={x}><span>{i+1}</span><p>{x}</p><Check/></div>)}</article></aside></div><div className="legal-note"><AlertTriangle/><span>El texto definitivo y el escalamiento deben ser validados por Legal, Calidad y Servicio al Cliente antes de la implementación comercial.</span></div></div>}
+function Dashboard({
+  setView,
+  role,
+  setRole,
+  xp,
+  currentLevel,
+  nextLevel,
+  levelProgress,
+  completion,
+  completed,
+  setSelectedModule,
+  setQuizOpen,
+}: any) {
+  const L = currentLevel.icon;
+  return (
+    <div className="page-stack">
+      <section className="welcome-row">
+        <div>
+          <span className="eyebrow">MIÉRCOLES · CONTINÚE SU RACHA</span>
+          <h1>
+            Buenos días, Kevin <span>👋</span>
+          </h1>
+          <p>
+            Hoy puede avanzar en <strong>Semáforo de riesgo</strong> y sumar 120
+            XP.
+          </p>
+        </div>
+        <div className="role-switch">
+          <button
+            className={role === "Asesor" ? "active" : ""}
+            onClick={() => setRole("Asesor")}
+          >
+            Asesor
+          </button>
+          <button
+            className={role === "Optómetra" ? "active" : ""}
+            onClick={() => setRole("Optómetra")}
+          >
+            Optómetra
+          </button>
+        </div>
+      </section>
+      <section className="stats-grid">
+        <StatCard
+          icon={Zap}
+          label="PUNTOS TOTALES"
+          value={`${xp.toLocaleString("es-EC")} XP`}
+          note="+310 esta semana"
+        />
+        <StatCard
+          icon={Flame}
+          label="RACHA ACTUAL"
+          value="7 días"
+          note="Récord personal: 12"
+          tone="orange"
+        />
+        <StatCard
+          icon={Target}
+          label="RUTA COMPLETADA"
+          value={`${completion}%`}
+          note={`${completed.length} de ${modules.length} módulos`}
+          tone="violet"
+        />
+        <StatCard
+          icon={Award}
+          label="PRECISIÓN"
+          value="92%"
+          note="En evaluaciones"
+          tone="blue"
+        />
+      </section>
+      <section className="dashboard-grid">
+        <article className="glass-card level-card">
+          <div className="level-head">
+            <div className="level-badge">
+              <L />
+            </div>
+            <div>
+              <span>NIVEL {levels.indexOf(currentLevel) + 1}</span>
+              <h2>{currentLevel.name}</h2>
+            </div>
+            <button onClick={() => setView("ranking")}>
+              Ver niveles
+              <ChevronRight />
+            </button>
+          </div>
+          <div className="level-progress">
+            <div>
+              <span>{xp.toLocaleString("es-EC")} XP</span>
+              <span>{nextLevel.min.toLocaleString("es-EC")} XP</span>
+            </div>
+            <Progress value={levelProgress} />
+            <p>
+              Le faltan <strong>{Math.max(0, nextLevel.min - xp)} XP</strong>{" "}
+              para convertirse en {nextLevel.name}.
+            </p>
+          </div>
+          <div className="badge-row">
+            <div className="mini-badge earned">
+              <ShieldCheck />
+              <span>Recepción segura</span>
+            </div>
+            <div className="mini-badge earned">
+              <Camera />
+              <span>Ojo clínico</span>
+            </div>
+            <div className="mini-badge locked">
+              <LockKeyhole />
+              <span>Riesgo cero</span>
+            </div>
+          </div>
+        </article>
+        <article className="glass-card weekly-card">
+          <div className="card-title">
+            <div>
+              <span>ACTIVIDAD</span>
+              <h3>XP esta semana</h3>
+            </div>
+            <strong>
+              790 <small>XP</small>
+            </strong>
+          </div>
+          <div className="chart-medium">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={weekly}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="var(--grid)"
+                />
+                <XAxis
+                  dataKey="day"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                />
+                <Bar dataKey="xp" radius={[8, 8, 2, 2]} fill="#24d5c4" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </article>
+      </section>
+      <section className="section-head">
+        <div>
+          <span>CONTINÚE APRENDIENDO</span>
+          <h2>Su ruta recomendada</h2>
+        </div>
+        <button onClick={() => setView("academia")}>
+          Ver ruta completa
+          <ChevronRight />
+        </button>
+      </section>
+      <section className="module-strip">
+        {modules.slice(2, 5).map((m: any, i: number) => (
+          <article key={m.id} className="glass-card module-card">
+            <div className={`module-icon ${m.color}`}>
+              <m.icon />
+            </div>
+            <div className="module-copy">
+              <div>
+                <span>{m.eyebrow}</span>
+                <b>{m.role}</b>
+              </div>
+              <h3>{m.title}</h3>
+              <p>{m.description}</p>
+              <div className="module-meta">
+                <span>
+                  <Clock3 />
+                  {m.duration}
+                </span>
+                <span>
+                  <Zap />
+                  {m.xp} XP
+                </span>
+              </div>
+            </div>
+            <Button onClick={() => setSelectedModule(m)} variant="outline">
+              {i === 0 ? "Continuar" : "Iniciar"}
+              <Play />
+            </Button>
+          </article>
+        ))}
+      </section>
+      <section className="action-banner">
+        <div className="banner-icon">
+          <GraduationCap />
+        </div>
+        <div>
+          <span>CERTIFICACIÓN</span>
+          <h2>¿Domina el protocolo completo?</h2>
+          <p>8 preguntas · aprobación mínima 80% · hasta 240 XP</p>
+        </div>
+        <Button onClick={() => setQuizOpen(true)} className="light-button">
+          Iniciar evaluación
+          <MoveRight />
+        </Button>
+      </section>
+    </div>
+  );
+}
 
-function FormSection({n,title,desc,children}:any){return <div className="form-section"><div className="form-section-title"><span>{n}</span><div><h2>{title}</h2><p>{desc}</p></div></div>{children}</div>}
-function PrintableReceipt({form,risk,checks,signature,photos}:any){const rows=[['FECHA DE RECEPCIÓN',form.date],['LOCAL',form.store],['NÚMERO DE OT / ARREGLO',form.ot],['ARMAZÓN',form.frameMaterial],['MARCA Y CÓDIGO',form.brand],['TIPO DE ARMAZÓN',form.frameType],['PLAQUETAS / ESTADO',form.pads],['TERMINALES / ESTADO',form.temples],['ESTADO ACCESORIOS',form.accessories],['CUADRADO',form.squared],['LUNAS',form.lenses],['MEDIDA',form.measure],['TRANSITIONS',form.transitions],['TIPO DE LUNA',form.lensType],['ESTADO DEL ARMAZÓN',form.frameState],['ESTADO DE FLEX',form.flex],['ESTADO DE LUNAS',form.lensState],['DÓNDE COMPRÓ',form.purchasePlace],['TIEMPO DE USO',form.age],['REPARACIONES',form.repairs],['OBSERVACIONES',form.observations],['ASESOR RESPONSABLE',form.advisor],['OPTÓMETRA RESPONSABLE',form.optometrist],['NOMBRE DEL CLIENTE',form.client],['CÉDULA / RUC',form.id],['NÚMERO DE TELÉFONO',form.phone],['EMAIL',form.email]];return <div className="print-receipt"><header><div className="print-logo"><Glasses/><div><strong>ÓPTICA LOS ANDES</strong><span>Academia OLA · Recepción segura</span></div></div><div><span>FICHA DIGITAL</span><strong>RIESGO {risk.toUpperCase()}</strong></div></header><h1>FORMULARIO RECEPCIÓN ARMAZONES / ARREGLO</h1><div className="print-rows">{rows.map(([a,b])=><div key={a}><strong>{a}</strong><span>{b||'—'}</span></div>)}</div><section className="print-clause"><p>En caso de que los productos de propiedad del cliente y entregados a nuestro personal requieran una manipulación para traspaso o montaje de lunas: ajuste, cuadre, arreglo o soldadura de armazón, Óptica Los Andes se compromete a realizar el trabajo con el cuidado adecuado; sin embargo, estos procesos involucran un riesgo del cual el cliente conoce, por lo que libera de toda responsabilidad a Óptica Los Andes S.A.</p><p>Óptica Los Andes no se responsabiliza por armazones y lunas dejados en nuestros puntos de venta en plazos superiores a 90 días, contados desde la fecha de recepción de este documento.</p></section><h2>EVIDENCIA FOTOGRÁFICA</h2><div className="print-photos">{photos.map((p:string,i:number)=><figure key={p}><img src={p} alt=""/><figcaption>{i===0?'FRONTAL':i===1?'LATERAL 1':i===2?'LATERAL 2':'DETALLE'}</figcaption></figure>)}</div><div className="print-confirm"><h2>INFORMACIÓN EXPLICADA AL CLIENTE</h2>{Object.values(checks).filter(Boolean).length} de {Object.keys(checks).length} confirmaciones registradas.</div>{signature&&<div className="print-signature"><img src={signature} alt="Firma del cliente"/><span>FIRMA ACEPTACIÓN CLIENTE</span></div>}</div>}
+function Academy({
+  role,
+  completed,
+  completion,
+  setSelectedModule,
+  setQuizOpen,
+}: any) {
+  return (
+    <div className="page-stack">
+      <section className="page-header">
+        <div>
+          <span className="eyebrow">RUTA DE FORMACIÓN</span>
+          <h1>Academia de Recepción Segura</h1>
+          <p>Contenido breve, visual y aplicable durante la atención diaria.</p>
+        </div>
+        <div className="completion-ring">
+          <div
+            style={{ "--p": `${completion * 3.6}deg` } as React.CSSProperties}
+          >
+            <strong>{completion}%</strong>
+            <span>completado</span>
+          </div>
+        </div>
+      </section>
+      <section className="learning-path">
+        <div className="path-line" />
+        {modules.map((m: any, i: number) => {
+          const done = completed.includes(m.id),
+            available = i === 0 || completed.includes(modules[i - 1].id);
+          return (
+            <article
+              className={`glass-card path-module ${done ? "done" : ""} ${!available ? "locked" : ""}`}
+              key={m.id}
+            >
+              <div className={`path-node ${done ? "done" : ""}`}>
+                {done ? <Check /> : <span>{i + 1}</span>}
+              </div>
+              <div className={`module-icon ${m.color}`}>
+                <m.icon />
+              </div>
+              <div className="path-content">
+                <div>
+                  <span>{m.eyebrow}</span>
+                  <b
+                    className={
+                      m.role === role || m.role === "Todos" ? "role-match" : ""
+                    }
+                  >
+                    {m.role}
+                  </b>
+                </div>
+                <h3>{m.title}</h3>
+                <p>{m.description}</p>
+                <div className="module-meta">
+                  <span>
+                    <Clock3 />
+                    {m.duration}
+                  </span>
+                  <span>
+                    <Zap />
+                    {m.xp} XP
+                  </span>
+                </div>
+              </div>
+              <Button
+                disabled={!available}
+                variant={done ? "outline" : "default"}
+                onClick={() => setSelectedModule(m)}
+              >
+                {done ? "Repasar" : available ? "Comenzar" : "Bloqueado"}
+                {available && !done ? <Play /> : <ChevronRight />}
+              </Button>
+            </article>
+          );
+        })}
+      </section>
+      <section className="certification-card glass-card">
+        <div className="cert-seal">
+          <Medal />
+        </div>
+        <div>
+          <span>CERTIFICACIÓN SAC</span>
+          <h2>Recepción Segura de Armazones</h2>
+          <p>Complete la ruta y obtenga mínimo 80% en la evaluación final.</p>
+        </div>
+        <Button onClick={() => setQuizOpen(true)} className="primary-button">
+          Presentar evaluación
+          <MoveRight />
+        </Button>
+      </section>
+    </div>
+  );
+}
+
+function Challenges({
+  riskCases,
+  riskRound,
+  riskScore,
+  riskFeedback,
+  chooseRisk,
+  nextRisk,
+  setQuizOpen,
+}: any) {
+  const item = riskCases[riskRound];
+  return (
+    <div className="page-stack">
+      <section className="page-header">
+        <div>
+          <span className="eyebrow">PRÁCTICA GAMIFICADA</span>
+          <h1>Retos de hoy</h1>
+          <p>
+            Entrene decisiones reales, gane puntos y fortalezca su criterio.
+          </p>
+        </div>
+        <div className="streak-pill">
+          <Flame />
+          <strong>7</strong>
+          <span>días de racha</span>
+        </div>
+      </section>
+      <section className="challenge-grid">
+        <article className="glass-card risk-game">
+          <div className="game-head">
+            <div className="game-icon">
+              <ScanSearch />
+            </div>
+            <div>
+              <span>LABORATORIO DE RIESGO</span>
+              <h2>Clasifique el caso</h2>
+            </div>
+            <b>
+              {riskRound + 1}/{riskCases.length}
+            </b>
+          </div>
+          <div className="case-visual">
+            <div className="case-frame">
+              <div />
+              <div />
+              <span />
+            </div>
+            <div>
+              <span>CASO {String(riskRound + 1).padStart(2, "0")}</span>
+              <h3>{item.title}</h3>
+              <p>Seleccione el nivel que corresponde según el protocolo.</p>
+            </div>
+          </div>
+          <div className="risk-buttons">
+            <button
+              disabled={!!riskFeedback}
+              onClick={() => chooseRisk("Bajo")}
+              className="low"
+            >
+              <span />
+              Riesgo bajo
+            </button>
+            <button
+              disabled={!!riskFeedback}
+              onClick={() => chooseRisk("Medio")}
+              className="medium"
+            >
+              <span />
+              Riesgo medio
+            </button>
+            <button
+              disabled={!!riskFeedback}
+              onClick={() => chooseRisk("Alto")}
+              className="high"
+            >
+              <span />
+              Riesgo alto
+            </button>
+          </div>
+          {riskFeedback && (
+            <div className="feedback success">
+              <CheckCircle2 />
+              <div>
+                <strong>Retroalimentación</strong>
+                <p>{riskFeedback}</p>
+              </div>
+              <Button onClick={nextRisk}>
+                Siguiente
+                <MoveRight />
+              </Button>
+            </div>
+          )}
+          <div className="game-footer">
+            <span>
+              <Target />
+              Aciertos: {riskScore}
+            </span>
+            <span>
+              <Zap />
+              Hasta 140 XP
+            </span>
+          </div>
+        </article>
+        <div className="side-challenges">
+          <article className="glass-card mini-challenge">
+            <div className="challenge-top">
+              <div className="icon-orb violet">
+                <Timer />
+              </div>
+              <span>+80 XP</span>
+            </div>
+            <h3>Trivia relámpago</h3>
+            <p>8 preguntas para resolver en una sola ronda.</p>
+            <div className="mini-stats">
+              <span>⏱ 5 min</span>
+              <span>🎯 80% meta</span>
+            </div>
+            <Button onClick={() => setQuizOpen(true)} variant="outline">
+              Jugar ahora
+              <Play />
+            </Button>
+          </article>
+          <article className="glass-card daily-card">
+            <span>RETO DIARIO</span>
+            <h3>Detecte 4 novedades</h3>
+            <p>
+              Observe las fotografías del caso y seleccione los puntos que deben
+              registrarse.
+            </p>
+            <div className="photo-triptych">
+              <img
+                src="/training/caso-frontal.jpg"
+                alt="Vista frontal de un armazón de práctica"
+              />
+              <img
+                src="/training/caso-lateral-derecho.jpg"
+                alt="Vista lateral derecha"
+              />
+              <img
+                src="/training/caso-lateral-izquierdo.jpg"
+                alt="Vista lateral izquierda"
+              />
+            </div>
+            <Button variant="outline">
+              Abrir caso
+              <ImageIcon />
+            </Button>
+          </article>
+        </div>
+      </section>
+      <section className="xp-rules glass-card">
+        <div>
+          <span>SISTEMA DE PUNTOS</span>
+          <h2>Cada acción correcta suma</h2>
+        </div>
+        <div className="rule-grid">
+          <div>
+            <PlayCircle />
+            <span>Microclase</span>
+            <strong>+50 XP</strong>
+          </div>
+          <div>
+            <ClipboardCheck />
+            <span>Evaluación ≥80%</span>
+            <strong>+180 XP</strong>
+          </div>
+          <div>
+            <Star />
+            <span>Puntaje perfecto</span>
+            <strong>+60 XP</strong>
+          </div>
+          <div>
+            <Flame />
+            <span>Racha semanal</span>
+            <strong>+100 XP</strong>
+          </div>
+          <div>
+            <Camera />
+            <span>Reto práctico</span>
+            <strong>+90 XP</strong>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Ranking({ xp, coins, filter, setFilter, award }: any) {
+  const filtered =
+    filter === "Todos"
+      ? leaderboard
+      : leaderboard.filter((x) => x.role === filter);
+  return (
+    <div className="page-stack">
+      <section className="page-header">
+        <div>
+          <span className="eyebrow">RECONOCIMIENTO Y MÉTRICAS</span>
+          <h1>Ranking Academia SAC</h1>
+          <p>
+            El puntaje reconoce constancia, conocimiento y aplicación correcta.
+          </p>
+        </div>
+        <div className="filter-pills">
+          {["Todos", "Asesor", "Optómetra"].map((f) => (
+            <button
+              className={filter === f ? "active" : ""}
+              onClick={() => setFilter(f)}
+              key={f}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      </section>
+      <section className="ranking-layout">
+        <article className="glass-card leaderboard">
+          <div className="card-title">
+            <div>
+              <span>CLASIFICACIÓN MENSUAL</span>
+              <h3>Mejores puntajes</h3>
+            </div>
+            <Trophy />
+          </div>
+          <div className="podium">
+            <div className="podium-person second">
+              <div>AM</div>
+              <Medal />
+              <strong>Andrés</strong>
+              <span>3.650 XP</span>
+            </div>
+            <div className="podium-person first">
+              <div>MF</div>
+              <Trophy />
+              <strong>María F.</strong>
+              <span>3.840 XP</span>
+            </div>
+            <div className="podium-person third">
+              <div>GG</div>
+              <Award />
+              <strong>Gema</strong>
+              <span>3.410 XP</span>
+            </div>
+          </div>
+          <div className="rank-list">
+            {filtered.map((p) => (
+              <div key={p.rank} className="rank-row">
+                <strong className="rank-num">{p.rank}</strong>
+                <div className="rank-avatar">
+                  {p.name
+                    .split(" ")
+                    .map((x) => x[0])
+                    .slice(0, 2)
+                    .join("")}
+                </div>
+                <div className="rank-name">
+                  <strong>{p.name}</strong>
+                  <span>
+                    {p.role} · {p.store}
+                  </span>
+                </div>
+                <span className="accuracy">{p.accuracy}% precisión</span>
+                <span className="rank-streak">
+                  <Flame />
+                  {p.streak}
+                </span>
+                <b>{p.xp.toLocaleString("es-EC")} XP</b>
+              </div>
+            ))}
+          </div>
+          <div className="your-rank">
+            <span>#12</span>
+            <div>
+              <strong>Kevin Hinojosa</strong>
+              <p>Subió 4 posiciones esta semana</p>
+            </div>
+            <b>{xp.toLocaleString("es-EC")} XP</b>
+          </div>
+        </article>
+        <div className="analytics-column">
+          <article className="glass-card mastery">
+            <div className="card-title">
+              <div>
+                <span>DOMINIO</span>
+                <h3>Habilidades evaluadas</h3>
+              </div>
+              <BarChart3 />
+            </div>
+            <div className="chart-radar">
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart data={mastery}>
+                  <PolarGrid stroke="var(--grid)" />
+                  <PolarAngleAxis
+                    dataKey="skill"
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+                  />
+                  <Radar
+                    dataKey="value"
+                    stroke="#477dff"
+                    fill="#477dff"
+                    fillOpacity={0.28}
+                  />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+          </article>
+          <article className="glass-card quality-card">
+            <div className="donut-wrap">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={riskData}
+                    innerRadius={48}
+                    outerRadius={68}
+                    paddingAngle={4}
+                    dataKey="value"
+                  >
+                    {riskData.map((d) => (
+                      <Cell key={d.name} fill={d.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              <div>
+                <strong>84%</strong>
+                <span>dominio</span>
+              </div>
+            </div>
+            <div>
+              <span>CRITERIO DE RIESGO</span>
+              <h3>Resultado del equipo</h3>
+              <p>16% requiere refuerzo dirigido.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section>
+        <div className="section-head">
+          <div>
+            <span>CATÁLOGO PROPUESTO</span>
+            <h2>Premios por SAC Coins</h2>
+          </div>
+          <div className="wallet">
+            <Coins />
+            {coins} disponibles
+          </div>
+        </div>
+        <div className="reward-grid">
+          {rewards.map((r) => (
+            <article className="glass-card reward-card" key={r.name}>
+              <div className="reward-art">
+                <r.icon />
+                <span>{r.tag}</span>
+              </div>
+              <h3>{r.name}</h3>
+              <p>
+                Reconocimiento sujeto a validación y disponibilidad de la
+                política interna del Área de SAC.
+              </p>
+              <Button
+                disabled={coins < r.coins}
+                variant="outline"
+                onClick={() => award("Premio reservado", 0, -r.coins)}
+              >
+                <Coins />
+                {r.coins} · {coins >= r.coins ? "Canjear" : "Bloqueado"}
+              </Button>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="admin-note">
+        <AlertTriangle />
+        <p>
+          <strong>Importante:</strong> premios, equivalencias y periodicidad son
+          una propuesta configurable y deben aprobarse internamente.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+function ReceptionForm({
+  form,
+  setField,
+  risk,
+  checks,
+  setChecks,
+  allChecks,
+  signature,
+  setSignature,
+  photos,
+  handlePhotos,
+}: any) {
+  const F = ({ label, name, type = "text", placeholder = "" }: any) => (
+      <label className="field">
+        <span>{label}</span>
+        <Input
+          type={type}
+          value={form[name] ?? ""}
+          onChange={(e) => setField(name, e.target.value)}
+          placeholder={placeholder}
+        />
+      </label>
+    ),
+    S = ({ label, name, options }: any) => (
+      <label className="field">
+        <span>{label}</span>
+        <select
+          value={form[name] ?? options[0]}
+          onChange={(e) => setField(name, e.target.value)}
+        >
+          {options.map((o: string) => (
+            <option key={o}>{o}</option>
+          ))}
+        </select>
+      </label>
+    );
+  return (
+    <div className="page-stack">
+      <section className="page-header form-header">
+        <div>
+          <span className="eyebrow">HERRAMIENTA OPERATIVA</span>
+          <h1>Ficha digital de recepción</h1>
+          <p>
+            Basada en el formulario entregado. Complete, explique, firme e
+            imprima.
+          </p>
+        </div>
+        <div className={`risk-status ${risk.toLowerCase()}`}>
+          <span />
+          <div>
+            <small>RIESGO CALCULADO</small>
+            <strong>{risk}</strong>
+          </div>
+        </div>
+      </section>
+      <div className="form-layout">
+        <form
+          className="glass-card reception-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            window.print();
+          }}
+        >
+          <FormSection
+            n="01"
+            title="Datos de recepción"
+            desc="Información general del ingreso."
+          >
+            <div className="field-grid">
+              <F label="Fecha de recepción" name="date" type="date" />
+              <F
+                label="Local"
+                name="store"
+                placeholder="Ej. Mall del Pacífico"
+              />
+              <F label="Número de OT / arreglo" name="ot" />
+              <F label="Asesor responsable" name="advisor" />
+              <F label="Optómetra responsable" name="optometrist" />
+            </div>
+          </FormSection>
+          <FormSection
+            n="02"
+            title="Armazón y lunas"
+            desc="Registre cada componente y su condición real."
+          >
+            <div className="field-grid">
+              <S
+                label="Material del armazón"
+                name="frameMaterial"
+                options={["Metal", "Acetato", "Nylon", "Mixto", "Otro"]}
+              />
+              <F label="Marca y código" name="brand" />
+              <S
+                label="Tipo de armazón"
+                name="frameType"
+                options={["Completo", "Semi al aire", "Al aire", "Gafa"]}
+              />
+              <F
+                label="Plaquetas / estado"
+                name="pads"
+                placeholder="Ej. 2, desgastadas"
+              />
+              <F label="Terminales / estado" name="temples" />
+              <F
+                label="Accesorios: brillos, logos, emblemas"
+                name="accessories"
+              />
+              <S label="Cuadrado" name="squared" options={["No", "Sí"]} />
+              <F label="Número de lunas" name="lenses" type="number" />
+              <S
+                label="Medida"
+                name="measure"
+                options={["Sí", "No", "No aplica"]}
+              />
+              <S
+                label="Transitions"
+                name="transitions"
+                options={["No", "Sí"]}
+              />
+              <S
+                label="Tipo de luna"
+                name="lensType"
+                options={[
+                  "Monofocal",
+                  "Progresiva",
+                  "Bifocal",
+                  "Sin lunas",
+                  "Otra",
+                ]}
+              />
+              <F label="Estado del flex de la montura" name="flex" />
+            </div>
+          </FormSection>
+          <FormSection
+            n="03"
+            title="Estado y antecedentes"
+            desc="Describa sin minimizar ninguna novedad."
+          >
+            <div className="field-grid">
+              <label className="field full">
+                <span>Estado del armazón</span>
+                <Textarea
+                  value={form.frameState ?? ""}
+                  onChange={(e) => setField("frameState", e.target.value)}
+                  placeholder="Rayado, deformado, fisurado, desgastado…"
+                />
+              </label>
+              <label className="field full">
+                <span>Estado de las lunas</span>
+                <Textarea
+                  value={form.lensState ?? ""}
+                  onChange={(e) => setField("lensState", e.target.value)}
+                  placeholder="Rayadas, capa AR desprendida, trizadas…"
+                />
+              </label>
+              <S
+                label="Dónde compró armazón / lunas / gafas"
+                name="purchasePlace"
+                options={[
+                  "Óptica Los Andes",
+                  "Otro establecimiento",
+                  "No recuerda",
+                ]}
+              />
+              <S
+                label="Tiempo de uso / fecha de compra"
+                name="age"
+                options={[
+                  "Menos de 1 año",
+                  "1 a 2 años",
+                  "Más de 2 años",
+                  "Cliente desconoce",
+                ]}
+              />
+              <F
+                label="Reparaciones anteriores"
+                name="repairs"
+                placeholder="Soldaduras, cambios, pegamentos…"
+              />
+              <label className="field full">
+                <span>Observaciones</span>
+                <Textarea
+                  value={form.observations ?? ""}
+                  onChange={(e) => setField("observations", e.target.value)}
+                />
+              </label>
+            </div>
+          </FormSection>
+          <FormSection
+            n="04"
+            title="Cliente y evidencia"
+            desc="Adjunte fotografías claras del estado recibido."
+          >
+            <div className="field-grid">
+              <F label="Nombre del cliente" name="client" />
+              <F label="Cédula / RUC" name="id" />
+              <F label="Número de teléfono" name="phone" type="tel" />
+              <F label="Email para notificación" name="email" type="email" />
+            </div>
+            <label className="photo-uploader">
+              <Camera />
+              <div>
+                <strong>Frontal, lateral 1, lateral 2 y detalle</strong>
+                <span>JPG o PNG · máximo 4 fotografías</span>
+              </div>
+              <b>Seleccionar</b>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => handlePhotos(e.target.files)}
+              />
+            </label>
+            {photos.length > 0 && (
+              <div className="photo-previews">
+                {photos.map((p: string, i: number) => (
+                  <img key={p} src={p} alt={`Evidencia ${i + 1}`} />
+                ))}
+              </div>
+            )}
+          </FormSection>
+          <FormSection
+            n="05"
+            title="Explicación obligatoria"
+            desc="Confirme cada punto antes de solicitar la firma."
+          >
+            <div className="clause-box">
+              <ShieldCheck />
+              <div>
+                <strong>Información del formulario</strong>
+                <p>
+                  En caso de que los productos del cliente requieran
+                  manipulación para traspaso o montaje de lunas, ajuste, cuadre,
+                  arreglo o soldadura, Óptica Los Andes realizará el trabajo con
+                  el cuidado adecuado; sin embargo, estos procesos involucran un
+                  riesgo que debe explicarse al cliente.
+                </p>
+                <p>
+                  Los armazones y lunas dejados en los puntos de venta por más
+                  de 90 días se sujetan a la cláusula del formulario de
+                  recepción.
+                </p>
+              </div>
+            </div>
+            <div className="check-list">
+              {[
+                [
+                  "reviewed",
+                  "Se revisó el estado general junto con el cliente.",
+                ],
+                ["shown", "Se mostraron las novedades visibles identificadas."],
+                [
+                  "manipulation",
+                  "Se explicó que el armazón será manipulado durante el proceso.",
+                ],
+                [
+                  "heat",
+                  "Se explicó que, según material y condición, puede requerir calor controlado.",
+                ],
+                [
+                  "age",
+                  "Se informó cómo la antigüedad y el desgaste afectan la resistencia.",
+                ],
+                [
+                  "risks",
+                  "Se explicaron posibles fisuras, trizaduras, deformación o rotura.",
+                ],
+                [
+                  "questions",
+                  "El cliente pudo realizar preguntas y confirmó su comprensión.",
+                ],
+              ].map(([k, t]) => (
+                <label key={k}>
+                  <Switch
+                    checked={checks[k]}
+                    onCheckedChange={(v) =>
+                      setChecks((c: any) => ({ ...c, [k]: v }))
+                    }
+                  />
+                  <span>{t}</span>
+                </label>
+              ))}
+            </div>
+          </FormSection>
+          <FormSection
+            n="06"
+            title="Firma de aceptación"
+            desc="Solicite la firma únicamente después de la explicación."
+          >
+            <SignaturePad onChange={setSignature} />
+            <div className="form-final">
+              <div
+                className={`validation ${allChecks && signature ? "ready" : "pending"}`}
+              >
+                {allChecks && signature ? <CheckCircle2 /> : <AlertTriangle />}
+                <div>
+                  <strong>
+                    {allChecks && signature
+                      ? "Ficha lista para generar"
+                      : "Complete los requisitos"}
+                  </strong>
+                  <span>
+                    {!allChecks
+                      ? "Faltan confirmaciones obligatorias."
+                      : !signature
+                        ? "Falta la firma del cliente."
+                        : "Puede imprimir o guardar como PDF."}
+                  </span>
+                </div>
+              </div>
+              <Button
+                type="submit"
+                disabled={
+                  !allChecks ||
+                  !signature ||
+                  (risk === "Alto" && !form.escalation)
+                }
+                className="primary-button"
+              >
+                <Printer />
+                Imprimir / Guardar PDF
+              </Button>
+            </div>
+            {risk === "Alto" && (
+              <label className="escalation">
+                <AlertTriangle />
+                <div>
+                  <strong>Riesgo alto: validación requerida</strong>
+                  <span>Registre quién autoriza continuar.</span>
+                </div>
+                <Input
+                  value={form.escalation ?? ""}
+                  onChange={(e) => setField("escalation", e.target.value)}
+                  placeholder="Responsable de validación"
+                />
+              </label>
+            )}
+          </FormSection>
+        </form>
+        <aside className="form-assistant">
+          <article className="glass-card">
+            <div className="assistant-head">
+              <Sparkles />
+              <div>
+                <span>ASISTENTE DE RECEPCIÓN</span>
+                <h3>Cómo explicarlo</h3>
+              </div>
+            </div>
+            <p>
+              “Antes de recibir su armazón vamos a revisar su estado. Durante el
+              montaje es necesario manipularlo y, dependiendo de su material y
+              condición, pueden realizarse ajustes o aplicarse calor
+              controlado.”
+            </p>
+            <button
+              onClick={() =>
+                navigator.clipboard?.writeText(
+                  "Antes de recibir su armazón vamos a revisar su estado. Durante el montaje es necesario manipularlo y, dependiendo de su material y condición, pueden realizarse ajustes o aplicarse calor controlado.",
+                )
+              }
+            >
+              Copiar explicación
+            </button>
+          </article>
+          <article className="glass-card risk-guide">
+            <span>SEMÁFORO</span>
+            <h3>Qué hacer ahora</h3>
+            <div className={risk === "Bajo" ? "active" : ""}>
+              <i className="low" />
+              <p>
+                <strong>Bajo</strong>Puede continuar siguiendo el protocolo.
+              </p>
+            </div>
+            <div className={risk === "Medio" ? "active" : ""}>
+              <i className="medium" />
+              <p>
+                <strong>Medio</strong>Explique y documente cada novedad.
+              </p>
+            </div>
+            <div className={risk === "Alto" ? "active" : ""}>
+              <i className="high" />
+              <p>
+                <strong>Alto</strong>Escalone para validación antes de
+                continuar.
+              </p>
+            </div>
+          </article>
+          <article className="glass-card process-card">
+            <span>PROGRESO</span>
+            <h3>Recepción correcta</h3>
+            {[
+              "Datos",
+              "Armazón",
+              "Estado",
+              "Evidencia",
+              "Explicación",
+              "Firma",
+            ].map((x, i) => (
+              <div key={x}>
+                <span>{i + 1}</span>
+                <p>{x}</p>
+                <Check />
+              </div>
+            ))}
+          </article>
+        </aside>
+      </div>
+      <div className="legal-note">
+        <AlertTriangle />
+        <span>
+          El texto definitivo y el escalamiento deben ser validados por Legal,
+          Calidad y el Área de SAC antes de la implementación comercial.
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function FormSection({ n, title, desc, children }: any) {
+  return (
+    <div className="form-section">
+      <div className="form-section-title">
+        <span>{n}</span>
+        <div>
+          <h2>{title}</h2>
+          <p>{desc}</p>
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+function PrintableReceipt({ form, risk, checks, signature, photos }: any) {
+  const rows = [
+    ["FECHA DE RECEPCIÓN", form.date],
+    ["LOCAL", form.store],
+    ["NÚMERO DE OT / ARREGLO", form.ot],
+    ["ARMAZÓN", form.frameMaterial],
+    ["MARCA Y CÓDIGO", form.brand],
+    ["TIPO DE ARMAZÓN", form.frameType],
+    ["PLAQUETAS / ESTADO", form.pads],
+    ["TERMINALES / ESTADO", form.temples],
+    ["ESTADO ACCESORIOS", form.accessories],
+    ["CUADRADO", form.squared],
+    ["LUNAS", form.lenses],
+    ["MEDIDA", form.measure],
+    ["TRANSITIONS", form.transitions],
+    ["TIPO DE LUNA", form.lensType],
+    ["ESTADO DEL ARMAZÓN", form.frameState],
+    ["ESTADO DE FLEX", form.flex],
+    ["ESTADO DE LUNAS", form.lensState],
+    ["DÓNDE COMPRÓ", form.purchasePlace],
+    ["TIEMPO DE USO", form.age],
+    ["REPARACIONES", form.repairs],
+    ["OBSERVACIONES", form.observations],
+    ["ASESOR RESPONSABLE", form.advisor],
+    ["OPTÓMETRA RESPONSABLE", form.optometrist],
+    ["NOMBRE DEL CLIENTE", form.client],
+    ["CÉDULA / RUC", form.id],
+    ["NÚMERO DE TELÉFONO", form.phone],
+    ["EMAIL", form.email],
+  ];
+  return (
+    <div className="print-receipt">
+      <header>
+        <div className="print-logo">
+          <Glasses />
+          <div>
+            <strong>ÓPTICA LOS ANDES</strong>
+            <span>Academia SAC · Servicio al Cliente</span>
+          </div>
+        </div>
+        <div>
+          <span>FICHA DIGITAL</span>
+          <strong>RIESGO {risk.toUpperCase()}</strong>
+        </div>
+      </header>
+      <h1>FORMULARIO RECEPCIÓN ARMAZONES / ARREGLO</h1>
+      <div className="print-rows">
+        {rows.map(([a, b]) => (
+          <div key={a}>
+            <strong>{a}</strong>
+            <span>{b || "—"}</span>
+          </div>
+        ))}
+      </div>
+      <section className="print-clause">
+        <p>
+          En caso de que los productos de propiedad del cliente y entregados a
+          nuestro personal requieran una manipulación para traspaso o montaje de
+          lunas: ajuste, cuadre, arreglo o soldadura de armazón, Óptica Los
+          Andes se compromete a realizar el trabajo con el cuidado adecuado; sin
+          embargo, estos procesos involucran un riesgo del cual el cliente
+          conoce, por lo que libera de toda responsabilidad a Óptica Los Andes
+          S.A.
+        </p>
+        <p>
+          Óptica Los Andes no se responsabiliza por armazones y lunas dejados en
+          nuestros puntos de venta en plazos superiores a 90 días, contados
+          desde la fecha de recepción de este documento.
+        </p>
+      </section>
+      <h2>EVIDENCIA FOTOGRÁFICA</h2>
+      <div className="print-photos">
+        {photos.map((p: string, i: number) => (
+          <figure key={p}>
+            <img src={p} alt="" />
+            <figcaption>
+              {i === 0
+                ? "FRONTAL"
+                : i === 1
+                  ? "LATERAL 1"
+                  : i === 2
+                    ? "LATERAL 2"
+                    : "DETALLE"}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+      <div className="print-confirm">
+        <h2>INFORMACIÓN EXPLICADA AL CLIENTE</h2>
+        {Object.values(checks).filter(Boolean).length} de{" "}
+        {Object.keys(checks).length} confirmaciones registradas.
+      </div>
+      {signature && (
+        <div className="print-signature">
+          <img src={signature} alt="Firma del cliente" />
+          <span>FIRMA ACEPTACIÓN CLIENTE</span>
+        </div>
+      )}
+    </div>
+  );
+}
