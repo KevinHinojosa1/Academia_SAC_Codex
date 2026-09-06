@@ -89,3 +89,20 @@ test("uses SAC consistently and keeps the informed-consent text aligned", async 
   assert.doesNotMatch(source, /Academia SAC/i);
   assert.match(source, /no sustituye las validaciones internas ni determina por sí solo la responsabilidad de las partes/);
 });
+
+test("keeps PIN hashing within the Cloudflare Workers PBKDF2 limit", async () => {
+  const { hashPin, verifyPin } = await vite.ssrLoadModule("/lib/server/crypto.ts");
+  const encoded = await hashPin("2468");
+  const [, iterations] = encoded.split("$");
+
+  assert.equal(Number(iterations), 100_000);
+  assert.equal(await verifyPin("2468", encoded), true);
+  assert.equal(await verifyPin("0000", encoded), false);
+
+  const repairMigration = await readFile(
+    path.join(root, "drizzle", "0002_cloudflare_compatible_pin_hashes.sql"),
+    "utf8",
+  );
+  assert.doesNotMatch(repairMigration, /pbkdf2_sha256\$210000/);
+  assert.equal((repairMigration.match(/pbkdf2_sha256\$100000/g) ?? []).length, 3);
+});

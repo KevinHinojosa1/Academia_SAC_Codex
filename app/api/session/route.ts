@@ -30,7 +30,7 @@ const loginSchema = z
   .strict();
 
 const DUMMY_PIN_HASH =
-  "pbkdf2_sha256$210000$0xJmpVFSTsi2-GTJbCaPiA$LUBrBdQcrk7tbINnJu8hkRenvXOCRzvm5V1q_p8eT_g";
+  "pbkdf2_sha256$100000$0xJmpVFSTsi2-GTJbCaPiA$NFz_YgAkFAtuMkmVkBo3c3X3kwNxxvy9Kh7wMaa77GI";
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCK_SECONDS = 15 * 60;
 

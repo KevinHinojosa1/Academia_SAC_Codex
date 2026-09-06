@@ -1,5 +1,8 @@
 const PIN_SCHEME = "pbkdf2_sha256";
-const PIN_ITERATIONS = 210_000;
+// Cloudflare Workers accepts at most 100,000 PBKDF2 iterations. Keep the
+// generation and validation ceiling aligned so malformed or legacy hashes are
+// rejected before Web Crypto can throw at runtime.
+const PIN_ITERATIONS = 100_000;
 const PIN_KEY_BYTES = 32;
 
 function bytesToBase64Url(bytes: Uint8Array): string {
@@ -41,7 +44,7 @@ export async function verifyPin(pin: string, encodedHash: string): Promise<boole
     scheme !== PIN_SCHEME ||
     !Number.isInteger(iterations) ||
     iterations < 100_000 ||
-    iterations > 1_000_000 ||
+    iterations > PIN_ITERATIONS ||
     !salt ||
     salt.length < 16 ||
     !expected ||

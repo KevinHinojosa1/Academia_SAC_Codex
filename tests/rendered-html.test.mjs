@@ -12,6 +12,7 @@ test("build packages the SAC application, APIs and database migrations", async (
   assert.match(serverBundle, /api\/receptions/);
   assert.ok((await stat(path.join(root, "dist", ".openai", "drizzle", "0000_same_goliath.sql"))).size > 1_000);
   assert.ok((await stat(path.join(root, "dist", ".openai", "drizzle", "0001_seed_pilot_collaborators.sql"))).size > 500);
+  assert.ok((await stat(path.join(root, "dist", ".openai", "drizzle", "0002_cloudflare_compatible_pin_hashes.sql"))).size > 500);
 });
 
 test("compiled client contains the final SAC experience and no legacy brand", async () => {

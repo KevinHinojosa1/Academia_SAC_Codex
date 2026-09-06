@@ -15,6 +15,13 @@
       "when": 1788640500000,
       "tag": "0001_seed_pilot_collaborators",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1788716400000,
+      "tag": "0002_cloudflare_compatible_pin_hashes",
+      "breakpoints": true
     }
   ]
 }

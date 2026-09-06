@@ -68,6 +68,10 @@ assert.equal(adviser.user.role, "asesor");
 await json("/api/progress", { cookie: adviser.cookie });
 await json("/api/admin/receptions", { cookie: adviser.cookie, expected: 403 });
 
+const optometrist = await login("SAC-2001", "1357");
+assert.equal(optometrist.user.role, "optometra");
+await json("/api/progress", { cookie: optometrist.cookie });
+
 await json("/api/progress/complete", {
   cookie: adviser.cookie,
   method: "POST",
