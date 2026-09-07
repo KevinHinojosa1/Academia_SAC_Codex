@@ -1,8 +1,9 @@
 "use client";
 
-import { Bot, ChevronRight, MessageCircleQuestion, Send, ShieldAlert, Sparkles, X } from "lucide-react";
+import { ChevronRight, MessageCircleQuestion, Send, ShieldAlert, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { botKnowledge } from "@/lib/sac-content";
+import SaciAvatar from "./saci-avatar";
 
 type ChatMessage = { id: string; role: "assistant" | "user"; text: string; related?: string[] };
 
@@ -46,10 +47,10 @@ export default function SacCoach({ open, onClose }: { open: boolean; onClose: ()
 
   return (
     <div className="coach-panel" role="dialog" aria-modal="true" aria-labelledby="coach-title">
-      <header><span className="coach-avatar"><Bot /></span><div><span className="eyebrow">ASISTENTE OPERATIVO</span><h2 id="coach-title">SACI</h2><small><i /> Base SAC 2026.1</small></div><button className="icon-button" onClick={onClose} aria-label="Cerrar asistente"><X /></button></header>
+      <header><SaciAvatar className="coach-header-avatar" /><div><span className="eyebrow">ASISTENTE DEL ÁREA DE SAC</span><h2 id="coach-title">SACI</h2><strong className="coach-role">Coach de Servicio al Cliente</strong><small><i /> Base SAC 2026.1</small></div><button className="icon-button" onClick={onClose} aria-label="Cerrar asistente"><X /></button></header>
       <div className="coach-scope"><ShieldAlert /><span>Orientación operativa. Ante riesgo alto o duda técnica, pausa y escala.</span></div>
       <div className="chat-feed" aria-live="polite">
-        {messages.map((message) => <article key={message.id} className={message.role}><span>{message.role === "assistant" ? <Sparkles /> : "Tú"}</span><div><p>{message.text}</p>{message.related && message.related.length > 0 && <small>Módulos relacionados: {message.related.map((id) => id.replace("sac-0", "")).join(", ")}</small>}</div></article>)}
+        {messages.map((message) => <article key={message.id} className={message.role}>{message.role === "assistant" ? <SaciAvatar className="chat-saci-avatar" alt="" /> : <span>Tú</span>}<div><p>{message.text}</p>{message.related && message.related.length > 0 && <small>Módulos relacionados: {message.related.map((id) => id.replace("sac-0", "")).join(", ")}</small>}</div></article>)}
         <div ref={endRef} />
       </div>
       {messages.length === 1 && <div className="chat-suggestions">{suggestions.map((suggestion) => <button key={suggestion} onClick={() => ask(suggestion)}><MessageCircleQuestion />{suggestion}<ChevronRight /></button>)}</div>}

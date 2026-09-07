@@ -10,6 +10,8 @@ test("build packages the SAC application, APIs and database migrations", async (
   const serverBundle = await readFile(path.join(root, "dist", "server", "index.js"), "utf8");
   assert.match(serverBundle, /SAC \| Recepción segura/);
   assert.match(serverBundle, /api\/receptions/);
+  assert.ok((await stat(path.join(root, "dist", "client", "og.png"))).size > 1_000_000);
+  assert.ok((await stat(path.join(root, "dist", "client", "media", "saci-mascota.png"))).size > 2_000_000);
   assert.ok((await stat(path.join(root, "dist", ".openai", "drizzle", "0000_same_goliath.sql"))).size > 1_000);
   assert.ok((await stat(path.join(root, "dist", ".openai", "drizzle", "0001_seed_pilot_collaborators.sql"))).size > 500);
   assert.ok((await stat(path.join(root, "dist", ".openai", "drizzle", "0002_cloudflare_compatible_pin_hashes.sql"))).size > 500);
@@ -21,5 +23,6 @@ test("compiled client contains the final SAC experience and no legacy brand", as
   const bundles = (await Promise.all(assetFiles.map((file) => readFile(path.join(root, "dist", "client", file), "utf8")))).join("\n");
   assert.match(bundles, /Bienvenido a SAC/);
   assert.match(bundles, /Pregúntale a SACI/);
+  assert.match(bundles, /Coach de Servicio al Cliente/);
   assert.doesNotMatch(bundles, /Academia SAC/i);
 });

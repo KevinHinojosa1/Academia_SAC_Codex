@@ -29,6 +29,9 @@ test("publishes a complete and coherent SAC curriculum", async () => {
   assert.equal(content.checklistChallenge.filter((item) => item.required).length, 8);
   assert.ok(content.botKnowledge.length >= 18);
   assert.ok(content.botKnowledge.every((item) => item.response.startsWith("SAC indica:")));
+  const escalationAnswer = content.botKnowledge.find((item) => item.id === "bot-escalamiento");
+  assert.ok(escalationAnswer?.keywords.includes("escalar"));
+  assert.match(escalationAnswer.response, /escala antes de continuar/i);
   for (const learningModule of content.sacModules) {
     assert.equal(
       content.questionBank.filter((question) => question.moduleId === learningModule.id).length,
@@ -76,6 +79,7 @@ test("ships playable videos, captions and downloadable operating files", async (
   }
   assert.ok((await stat(path.join(root, "public", "resources", "registro-sac.xlsx"))).size > 100_000);
   assert.ok((await stat(path.join(root, "public", "resources", "formato-recepcion-sac.pdf"))).size > 5_000);
+  assert.ok((await stat(path.join(root, "public", "media", "saci-mascota.png"))).size > 2_000_000);
 });
 
 test("uses SAC consistently and keeps the informed-consent text aligned", async () => {
@@ -88,6 +92,17 @@ test("uses SAC consistently and keeps the informed-consent text aligned", async 
   const source = (await Promise.all(files.map((file) => readFile(path.join(root, file), "utf8")))).join("\n");
   assert.doesNotMatch(source, /Academia SAC/i);
   assert.match(source, /no sustituye las validaciones internas ni determina por sí solo la responsabilidad de las partes/);
+
+  const mascotSource = (
+    await Promise.all(
+      ["app/sac-platform.tsx", "app/components/sac-coach.tsx", "app/components/saci-avatar.tsx"].map(
+        (file) => readFile(path.join(root, file), "utf8"),
+      ),
+    )
+  ).join("\n");
+  assert.match(mascotSource, /SACI, mascota del Área de SAC/);
+  assert.match(mascotSource, /Coach de Servicio al Cliente/);
+  assert.match(mascotSource, /\/media\/saci-mascota\.png/);
 });
 
 test("keeps PIN hashing within the Cloudflare Workers PBKDF2 limit", async () => {

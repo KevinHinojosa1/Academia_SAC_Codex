@@ -1630,6 +1630,14 @@ export const botKnowledge: BotKnowledgeItem[] = [
     escalation: true,
   },
   {
+    id: "bot-escalamiento",
+    intent: "Cuándo escalar un caso",
+    keywords: ["escalar", "escalamiento", "cuando escalo", "validacion", "autorizar"],
+    response: "SAC indica: escala antes de continuar cuando observes fisuras o trizaduras, piezas críticas flojas, reparaciones estructurales, deformación severa, una reacción inesperada durante la manipulación, desacuerdo del cliente o cualquier duda técnica. Conserva el producto, registra la evidencia y deja trazabilidad de quién valida, la decisión y su referencia.",
+    relatedModuleIds: ["sac-04", "sac-08"],
+    escalation: true,
+  },
+  {
     id: "bot-fisura",
     intent: "Fisura o microfisura",
     keywords: ["fisura", "microfisura", "grieta", "rajado", "linea"],

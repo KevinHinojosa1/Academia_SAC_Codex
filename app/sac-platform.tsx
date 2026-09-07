@@ -2,7 +2,6 @@
 
 import {
   BadgeCheck,
-  Bot,
   ChevronRight,
   ClipboardPlus,
   Coins,
@@ -28,6 +27,7 @@ import TrainingExperience from "./components/training-experience";
 import GameCenter from "./components/game-center";
 import DataCenter from "./components/data-center";
 import SacCoach from "./components/sac-coach";
+import SaciAvatar from "./components/saci-avatar";
 import { sacModules } from "@/lib/sac-content";
 
 export type SacUser = {
@@ -215,7 +215,10 @@ export default function SacPlatform() {
   if (checking) {
     return (
       <main className="sac-loading" aria-live="polite">
-        <div className="sac-logo-mark">SAC</div>
+        <div className="sac-loading-lockup">
+          <SaciAvatar className="sac-loading-mascot" priority />
+          <strong>SAC</strong>
+        </div>
         <LoaderCircle className="spin" aria-hidden="true" />
         <p>Preparando tu experiencia segura…</p>
       </main>
@@ -235,8 +238,8 @@ export default function SacPlatform() {
       <a className="skip-link" href="#contenido-principal">Saltar al contenido</a>
       <aside className={`sac-sidebar ${menuOpen ? "is-open" : ""}`} aria-label="Navegación principal">
         <div className="sac-brand">
-          <div className="sac-logo-mark">SAC</div>
-          <div><strong>Recepción segura</strong><span>Formar · practicar · registrar</span></div>
+          <SaciAvatar className="sac-brand-mascot" />
+          <div><strong>SAC</strong><span>Recepción segura</span></div>
           <button className="icon-button sidebar-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú"><X /></button>
         </div>
         <nav>
@@ -316,7 +319,8 @@ export default function SacPlatform() {
       </div>
 
       <button className="coach-launcher" onClick={() => setCoachOpen(true)} aria-label="Abrir asistente SACI">
-        <Bot aria-hidden="true" /><span>Pregúntale a SACI</span>
+        <SaciAvatar className="coach-launcher-avatar" alt="" />
+        <span className="coach-launcher-copy"><strong>Pregúntale a SACI</strong><small>Coach de Servicio al Cliente</small></span>
       </button>
       <SacCoach open={coachOpen} onClose={() => setCoachOpen(false)} />
       <div className="toast-region" aria-live="polite" aria-atomic="true">{toast && <div className="sac-toast"><BadgeCheck />{toast}</div>}</div>
@@ -346,7 +350,10 @@ function LoginScreen({ onLogin }: { onLogin: (code: string, pin: string) => Prom
   return (
     <main className="login-page">
       <section className="login-story">
-        <div className="login-brand"><div className="sac-logo-mark">SAC</div><span>Recepción segura</span></div>
+        <div className="login-brand">
+          <SaciAvatar className="login-brand-mascot" priority />
+          <span><strong>SAC</strong><small>Recepción segura</small></span>
+        </div>
         <div className="login-copy">
           <span className="eyebrow">EXPERIENCIA OPERATIVA · 2026</span>
           <h1>Más claridad en cada recepción. Más confianza en cada decisión.</h1>
@@ -355,6 +362,10 @@ function LoginScreen({ onLogin }: { onLogin: (code: string, pin: string) => Prom
             <span><Play />3 microclases con subtítulos</span>
             <span><Gamepad2 />6 simuladores interactivos</span>
             <span><ShieldCheck />Datos y evidencias protegidos</span>
+          </div>
+          <div className="login-mascot-card">
+            <SaciAvatar className="login-mascot-portrait" alt="" />
+            <div><span>TU COACH DE SERVICIO</span><strong>SACI</strong><p>Te acompaña con respuestas, práctica y criterios del protocolo SAC.</p></div>
           </div>
         </div>
         <p className="login-foot">SAC · Óptica Los Andes</p>
