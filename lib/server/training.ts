@@ -4,8 +4,8 @@ import {
   checklistChallenge,
   conversationCases,
   finalQuizQuestions,
+  MODULE_EXPERIENCE_TOKENS,
   protocolOrder,
-  questionBank,
   riskCases,
   sacModules,
   triviaQuestions,
@@ -107,21 +107,18 @@ function evaluation(
 export function evaluateActivity(input: z.infer<typeof completionRequestSchema>): Evaluation {
   const moduleReward = moduleRewards[input.activityId];
   if (moduleReward) {
-    const moduleQuestions = questionBank
-      .filter((question) => question.moduleId === moduleReward.moduleId)
-      .slice(0, 6);
-    const answers = requireNumberAnswers(
+    const answers = requireStringAnswers(
       input,
-      moduleQuestions.length,
-      "La minievaluación del módulo requiere seis respuestas.",
+      MODULE_EXPERIENCE_TOKENS.length,
+      "El módulo requiere revisar la demostración, explorar los ejemplos y completar la práctica guiada.",
     );
-    const score = scoreOrdered(answers, moduleQuestions.map((question) => question.answer));
-    const passed = score >= 5;
+    const score = scoreOrdered(answers, MODULE_EXPERIENCE_TOKENS);
+    const passed = score === MODULE_EXPERIENCE_TOKENS.length;
     return evaluation(
       input.activityId,
       moduleReward.moduleId,
       score,
-      moduleQuestions.length,
+      MODULE_EXPERIENCE_TOKENS.length,
       passed,
       { xp: moduleReward.xp, coins: Math.round(moduleReward.xp / 4) },
       `Módulo ${moduleReward.moduleId} completado`,

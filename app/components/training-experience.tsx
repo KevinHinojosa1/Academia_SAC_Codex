@@ -5,26 +5,35 @@ import {
   BookOpenCheck,
   Check,
   CheckCircle2,
+  ChevronLeft,
   ChevronRight,
   Clock3,
   Download,
+  Eye,
   FileCheck2,
   GraduationCap,
+  Images,
+  Lightbulb,
   LoaderCircle,
   LockKeyhole,
   Play,
   Printer,
+  ScanSearch,
+  ShieldCheck,
   Sparkles,
+  Target,
   Video,
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   finalQuizQuestions,
-  questionBank,
+  MODULE_EXPERIENCE_TOKENS,
   sacModules,
+  trainingExamples,
   type SacModule,
+  type TrainingExample,
 } from "@/lib/sac-content";
 import type { CompletionResult, SacUser } from "../sac-platform";
 
@@ -50,7 +59,7 @@ export default function TrainingExperience({ completedModules, certified, user, 
   return (
     <div className="page-stack">
       <header className="page-heading">
-        <div><span className="eyebrow">RUTA SAC · 8 MÓDULOS</span><h1>Formación que se convierte en criterio</h1><p>Microclases breves, decisiones aplicadas y retroalimentación para cada rol.</p></div>
+        <div><span className="eyebrow">RUTA SAC · 8 EXPERIENCIAS</span><h1>Aprende mirando, explorando y practicando</h1><p>Videos, ejemplos visuales y procedimientos guiados. Las preguntas quedan únicamente en Trivias y Evaluación.</p></div>
         <div className="completion-badge"><strong>{percent}%</strong><span>{completedCount} de {sacModules.length}</span></div>
       </header>
 
@@ -59,12 +68,12 @@ export default function TrainingExperience({ completedModules, certified, user, 
           const completed = completedModules.has(module.id) || completedModules.has(String(module.order));
           return (
             <article className={`learning-card ${completed ? "completed" : ""}`} key={module.id}>
-              <div className="learning-poster"><Image src={module.poster} alt="" fill sizes="(max-width: 620px) 100vw, 190px" /><span>{module.kicker}</span>{completed && <i><Check /></i>}</div>
+              <div className="learning-poster"><Image src={module.poster} alt={`Ejemplo visual de ${module.title.replace("SAC | ", "")}`} fill sizes="(max-width: 620px) 100vw, 190px" /><span>{module.kicker}</span>{completed && <i><Check /></i>}</div>
               <div className="learning-copy">
                 <div className="learning-meta"><span>MÓDULO {String(module.order).padStart(2, "0")}</span><span><Clock3 />{module.duration} min</span></div>
                 <h2>{module.title.replace("SAC | ", "")}</h2>
                 <p>{module.summary}</p>
-                <div className="learning-foot"><span className="role-pill">{module.role}</span><span className="xp-pill">+{module.xp} XP</span></div>
+                <div className="learning-foot"><span className="role-pill">{module.role}</span><span className="visual-pill"><Images />3 ejemplos</span><span className="xp-pill">+{module.xp} XP</span></div>
                 <button className={completed ? "secondary-action" : "primary-action"} onClick={() => setActiveModule(module)}>
                   {completed ? <BookOpenCheck /> : <Play />}{completed ? "Repasar módulo" : "Comenzar módulo"}<ChevronRight />
                 </button>
@@ -98,36 +107,52 @@ export default function TrainingExperience({ completedModules, certified, user, 
   );
 }
 
+const lessonStages = [
+  { label: "Mira", icon: Video },
+  { label: "Explora", icon: ScanSearch },
+  { label: "Practica", icon: Target },
+  { label: "Cierra", icon: ShieldCheck },
+] as const;
+
+function ExampleVisual({ example, compact = false }: { example: TrainingExample; compact?: boolean }) {
+  return (
+    <div
+      className={`training-example-visual ${compact ? "compact" : ""} crop-${example.crop ?? "full"}`}
+      role="img"
+      aria-label={example.imageAlt}
+      style={{ backgroundImage: `url(${example.image})` }}
+    />
+  );
+}
+
 function ModuleDialog({ module, alreadyCompleted, onClose, onComplete }: { module: SacModule; alreadyCompleted: boolean; onClose: () => void; onComplete: Props["onComplete"] }) {
-  const questions = useMemo(() => questionBank.filter((item) => item.moduleId === module.id).slice(0, 6), [module.id]);
+  const examples = trainingExamples[module.id] ?? [];
+  const [stage, setStage] = useState(0);
   const [videoSeen, setVideoSeen] = useState(alreadyCompleted);
-  const [checked, setChecked] = useState<Set<number>>(new Set(alreadyCompleted ? module.checklist.map((_, index) => index) : []));
-  const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [score, setScore] = useState<number | null>(null);
+  const [selectedExample, setSelectedExample] = useState<number | null>(null);
+  const [viewedExamples, setViewedExamples] = useState<Set<number>>(
+    new Set(alreadyCompleted ? examples.map((_, index) => index) : []),
+  );
+  const [practiceStep, setPracticeStep] = useState(alreadyCompleted ? module.checklist.length : 0);
+  const [saved, setSaved] = useState(alreadyCompleted);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const checklistReady = checked.size === module.checklist.length;
-  const quizReady = questions.length === 6 && questions.every((_, index) => answers[index] !== undefined);
+  const examplesReady = examples.length > 0 && viewedExamples.size === examples.length;
+  const practiceReady = practiceStep === module.checklist.length;
+  const selected = selectedExample === null ? null : examples[selectedExample];
+  const stageDone = [videoSeen, examplesReady, practiceReady, saved];
 
-  const toggleCheck = (index: number) => {
-    setChecked((current) => {
-      const next = new Set(current);
-      if (next.has(index)) next.delete(index); else next.add(index);
-      return next;
-    });
+  const openExample = (index: number) => {
+    setSelectedExample(index);
+    setViewedExamples((current) => new Set(current).add(index));
   };
 
-  const evaluate = async () => {
-    setError("");
-    const nextScore = questions.reduce((total, question, index) => total + (answers[index] === question.answer ? 1 : 0), 0);
-    setScore(nextScore);
-    if (nextScore < 5) return;
+  const completeModule = async () => {
     setBusy(true);
+    setError("");
     try {
-      await onComplete(
-        `module-${module.order}`,
-        questions.map((_, index) => answers[index]),
-      );
+      await onComplete(`module-${module.order}`, [...MODULE_EXPERIENCE_TOKENS]);
+      setSaved(true);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "No fue posible guardar el módulo.");
     } finally {
@@ -135,27 +160,121 @@ function ModuleDialog({ module, alreadyCompleted, onClose, onComplete }: { modul
     }
   };
 
+  const canOpenStage = (index: number) =>
+    index === 0 ||
+    (index === 1 && videoSeen) ||
+    (index === 2 && videoSeen && examplesReady) ||
+    (index === 3 && videoSeen && examplesReady && practiceReady);
+
+  const footerMessage = stage === 0
+    ? videoSeen ? "Demostración revisada. Continúa con los ejemplos." : "Reproduce al menos el 82 % de la demostración."
+    : stage === 1
+      ? examplesReady ? "Ya exploraste los tres ejemplos." : `Explora las imágenes: ${viewedExamples.size}/${examples.length}`
+      : stage === 2
+        ? practiceReady ? "Ruta práctica completada." : `Aplica el procedimiento paso a paso: ${practiceStep}/${module.checklist.length}`
+        : saved ? "La experiencia ya consta como completada." : "Todo listo para guardar tu progreso.";
+
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="sac-modal lesson-modal" role="dialog" aria-modal="true" aria-labelledby="lesson-title">
-        <header className="modal-header"><div><span className="eyebrow">MÓDULO {String(module.order).padStart(2, "0")} · {module.kicker.toUpperCase()}</span><h2 id="lesson-title">{module.title.replace("SAC | ", "")}</h2></div><button className="icon-button" onClick={onClose} aria-label="Cerrar módulo"><X /></button></header>
-        <div className="lesson-body">
-          <div className="video-shell">
-            <video controls preload="metadata" poster={module.poster} onEnded={() => setVideoSeen(true)} onTimeUpdate={(event) => { if (event.currentTarget.duration && event.currentTarget.currentTime / event.currentTarget.duration > 0.82) setVideoSeen(true); }}>
-              <source src={module.video} type="video/mp4" />
-              <track kind="captions" src={module.captions} srcLang="es" label="Español" default />
-              Tu navegador no puede reproducir este video.
-            </video>
-            <div className={videoSeen ? "media-status done" : "media-status"}>{videoSeen ? <CheckCircle2 /> : <Video />}<span>{videoSeen ? "Microclase revisada" : "Mira al menos el 82 % para continuar"}</span></div>
-          </div>
-          <div className="objective-panel"><span className="eyebrow">AL TERMINAR PODRÁS</span><ul>{module.objectives.map((objective) => <li key={objective}><Check />{objective}</li>)}</ul></div>
-          <div className="lesson-sections">{module.sections.map((section) => <article key={section.title}><h3>{section.title}</h3><p>{section.body}</p>{section.tip && <aside><Sparkles />{section.tip}</aside>}</article>)}</div>
-          <section className="lesson-checklist"><div className="section-heading"><div><span className="eyebrow">COMPROBACIÓN PRÁCTICA</span><h3>Marca cada conducta que ya puedes aplicar</h3></div><span>{checked.size}/{module.checklist.length}</span></div><div className="check-grid">{module.checklist.map((item, index) => <label key={item} className={checked.has(index) ? "selected" : ""}><input type="checkbox" checked={checked.has(index)} onChange={() => toggleCheck(index)} /><span><Check /></span>{item}</label>)}</div></section>
-          <section className="module-quiz"><span className="eyebrow">MINIEVALUACIÓN · 5/6 PARA APROBAR</span><div className="question-stack">{questions.map((question, questionIndex) => <fieldset key={question.id}><legend><small>{question.difficulty}</small>{questionIndex + 1}. {question.prompt}</legend><div className="option-grid">{question.options.map((option, optionIndex) => <label key={option} className={answers[questionIndex] === optionIndex ? "selected" : ""}><input type="radio" name={`${module.id}-${question.id}`} checked={answers[questionIndex] === optionIndex} onChange={() => setAnswers((current) => ({ ...current, [questionIndex]: optionIndex }))} /><span>{String.fromCharCode(65 + optionIndex)}</span>{option}</label>)}</div>{score !== null && <p className={answers[questionIndex] === question.answer ? "answer-note correct" : "answer-note incorrect"}>{answers[questionIndex] === question.answer ? "Correcto. " : `Respuesta correcta: ${String.fromCharCode(65 + question.answer)}. `}{question.explanation}</p>}</fieldset>)}</div></section>
-          {score !== null && <div className={`result-banner ${score >= 5 ? "success" : "warning"}`} role="status"><strong>{score >= 5 ? "¡Criterio demostrado!" : "Repasa y vuelve a intentarlo"}</strong><span>Obtuviste {score} de 6 respuestas correctas.</span></div>}
-          {error && <div className="form-alert error" role="alert">{error}</div>}
+        <header className="modal-header"><div><span className="eyebrow">EXPERIENCIA {String(module.order).padStart(2, "0")} · {module.kicker.toUpperCase()}</span><h2 id="lesson-title">{module.title.replace("SAC | ", "")}</h2><p>Demostración, análisis visual y práctica guiada. Aquí no hay preguntas.</p></div><button className="icon-button" onClick={onClose} aria-label="Cerrar módulo"><X /></button></header>
+
+        <nav className="lesson-stage-rail" aria-label="Etapas de la experiencia">
+          {lessonStages.map((item, index) => {
+            const Icon = item.icon;
+            return <button key={item.label} onClick={() => setStage(index)} disabled={!canOpenStage(index)} aria-current={stage === index ? "step" : undefined} className={stageDone[index] ? "done" : ""}><span>{stageDone[index] ? <Check /> : <Icon />}</span><small>0{index + 1}</small><strong>{item.label}</strong></button>;
+          })}
+        </nav>
+
+        <div className="lesson-body interactive-lesson-body">
+          {stage === 0 && (
+            <div className="lesson-stage-panel">
+              <div className="video-shell">
+                <video controls preload="metadata" poster={module.poster} onEnded={() => setVideoSeen(true)} onTimeUpdate={(event) => { if (event.currentTarget.duration && event.currentTarget.currentTime / event.currentTarget.duration > 0.82) setVideoSeen(true); }}>
+                  <source src={module.video} type="video/mp4" />
+                  <track kind="captions" src={module.captions} srcLang="es" label="Español" default />
+                  Tu navegador no puede reproducir este video.
+                </video>
+                <div className={videoSeen ? "media-status done" : "media-status"}>{videoSeen ? <CheckCircle2 /> : <Video />}<span>{videoSeen ? "Demostración revisada" : "Mira al menos el 82 % para continuar"}</span></div>
+              </div>
+              <div className="objective-panel"><span className="eyebrow">LO QUE VAS A PRACTICAR</span><ul>{module.objectives.map((objective) => <li key={objective}><Check />{objective}</li>)}</ul></div>
+              <section className="saci-learning-note"><Lightbulb /><div><span>SACI TE ACOMPAÑA</span><p>No memorices respuestas. Observa cómo cambia el procedimiento cuando aparece una señal nueva y reproduce después la secuencia en la práctica guiada.</p></div></section>
+            </div>
+          )}
+
+          {stage === 1 && (
+            <div className="lesson-stage-panel">
+              <div className="stage-intro"><div><span className="eyebrow">LABORATORIO VISUAL</span><h3>Abre cada imagen y descubre cómo se actúa</h3><p>Selecciona los tres casos. SACI te muestra qué observar, qué hacer y qué evidencia debe quedar.</p></div><span className="stage-counter"><Eye />{viewedExamples.size}/{examples.length} vistos</span></div>
+              <div className="training-example-tabs">
+                {examples.map((example, index) => (
+                  <button key={example.id} onClick={() => openExample(index)} className={`${selectedExample === index ? "active" : ""} ${viewedExamples.has(index) ? "viewed" : ""}`}>
+                    <ExampleVisual example={example} compact />
+                    <span><small>{example.label}</small><strong>{example.title}</strong></span>
+                    {viewedExamples.has(index) && <CheckCircle2 />}
+                  </button>
+                ))}
+              </div>
+              {selected ? (
+                <article className={`training-example-detail tone-${selected.tone}`}>
+                  <ExampleVisual example={selected} />
+                  <div className="example-analysis">
+                    <span className="example-tone">{selected.label}</span>
+                    <h3>{selected.title}</h3>
+                    <p className="example-context">{selected.context}</p>
+                    <dl>
+                      <div><dt><ScanSearch />Qué observar</dt><dd>{selected.observe}</dd></div>
+                      <div><dt><Target />Cómo actuar</dt><dd>{selected.action}</dd></div>
+                      <div><dt><FileCheck2 />Qué debe quedar</dt><dd>{selected.evidence}</dd></div>
+                    </dl>
+                  </div>
+                </article>
+              ) : (
+                <div className="example-empty"><Images /><strong>Elige una imagen para comenzar</strong><span>Los detalles aparecerán aquí, sin calificaciones ni respuestas A, B, C o D.</span></div>
+              )}
+            </div>
+          )}
+
+          {stage === 2 && (
+            <div className="lesson-stage-panel">
+              <div className="stage-intro"><div><span className="eyebrow">PRÁCTICA GUIADA</span><h3>Ejecuta el procedimiento con SACI</h3><p>Avanza una acción a la vez. Cada paso revela el criterio que debes aplicar en una recepción real.</p></div><span className="stage-counter"><Target />{practiceStep}/{module.checklist.length} aplicados</span></div>
+              <div className="guided-practice">
+                <div className="guided-practice-visual"><Image src={module.poster} alt={`Ejemplo visual del módulo ${module.order}: ${module.title.replace("SAC | ", "")}`} fill sizes="(max-width: 620px) 100vw, 330px" /><span><Sparkles />SACI · modo práctica</span></div>
+                <div className="practice-timeline">
+                  {module.checklist.map((item, index) => {
+                    const completed = index < practiceStep;
+                    const current = index === practiceStep;
+                    const guide = module.sections[index % module.sections.length];
+                    return <article key={item} className={completed ? "completed" : current ? "current" : "locked"}><span>{completed ? <Check /> : index + 1}</span><div><small>{completed ? "APLICADO" : current ? "PASO ACTUAL" : "SIGUIENTE"}</small><h4>{item}</h4>{current && <p>{guide.body}</p>}{current && guide.tip && <aside><Lightbulb />{guide.tip}</aside>}</div></article>;
+                  })}
+                  {!practiceReady && <button className="practice-action" onClick={() => setPracticeStep((current) => Math.min(current + 1, module.checklist.length))}><Play />Aplicar este paso y continuar<ChevronRight /></button>}
+                  {practiceReady && <div className="practice-complete"><CheckCircle2 /><div><strong>Procedimiento recorrido</strong><span>Ya aplicaste cada acción con su contexto operativo.</span></div></div>}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {stage === 3 && (
+            <div className="lesson-stage-panel">
+              <div className="applied-summary-hero"><ShieldCheck /><div><span className="eyebrow">CIERRE APLICADO</span><h3>Ya puedes llevar este criterio a la recepción</h3><p>Revisaste una demostración, analizaste tres casos visuales y ejecutaste el procedimiento completo.</p></div></div>
+              <div className="applied-summary-grid">
+                <section><span className="summary-icon"><Eye /></span><small>CASOS QUE YA RECONOCES</small>{examples.map((example) => <p key={example.id}><Check />{example.title}</p>)}</section>
+                <section><span className="summary-icon"><Target /></span><small>RUTA QUE YA PRACTICASTE</small>{module.checklist.map((item) => <p key={item}><Check />{item}</p>)}</section>
+              </div>
+              <section className="saci-learning-note success"><CheckCircle2 /><div><span>FORMACIÓN SIN EXAMEN</span><p>Guardar este módulo confirma la experiencia práctica. Las preguntas calificadas permanecen separadas en Trivias y en la Evaluación final.</p></div></section>
+              {saved && <div className="result-banner success" role="status"><strong>¡Experiencia completada!</strong><span>Tu avance y recompensa quedaron guardados.</span></div>}
+              {error && <div className="form-alert error" role="alert">{error}</div>}
+            </div>
+          )}
         </div>
-        <footer className="modal-footer"><span>{alreadyCompleted ? "Este módulo ya consta como completado." : !videoSeen ? "Primero revisa la microclase." : !checklistReady ? "Completa la comprobación práctica." : !quizReady ? "Responde las seis preguntas." : "Todo listo para evaluar."}</span><button className="primary-action" disabled={alreadyCompleted || busy || !videoSeen || !checklistReady || !quizReady} onClick={evaluate}>{busy ? <LoaderCircle className="spin" /> : <CheckCircle2 />}{alreadyCompleted ? "Módulo completado" : busy ? "Guardando…" : score !== null && score < 5 ? "Volver a evaluar" : "Evaluar y completar"}</button></footer>
+
+        <footer className="modal-footer interactive-lesson-footer">
+          <button className="secondary-action" disabled={stage === 0} onClick={() => setStage((current) => Math.max(0, current - 1))}><ChevronLeft />Anterior</button>
+          <span>{footerMessage}</span>
+          {stage === 0 && <button className="primary-action" disabled={!videoSeen} onClick={() => setStage(1)}>Explorar ejemplos<ChevronRight /></button>}
+          {stage === 1 && <button className="primary-action" disabled={!examplesReady} onClick={() => setStage(2)}>Ir a la práctica<ChevronRight /></button>}
+          {stage === 2 && <button className="primary-action" disabled={!practiceReady} onClick={() => setStage(3)}>Ver mi cierre<ChevronRight /></button>}
+          {stage === 3 && (saved ? <button className="primary-action" onClick={onClose}><CheckCircle2 />Cerrar experiencia</button> : <button className="primary-action" disabled={busy} onClick={completeModule}>{busy ? <LoaderCircle className="spin" /> : <CheckCircle2 />}{busy ? "Guardando…" : "Guardar módulo completado"}</button>)}
+        </footer>
       </section>
     </div>
   );

@@ -1,6 +1,6 @@
 # SAC · Recepción segura
 
-Plataforma de formación, práctica y trazabilidad para la recepción segura de armazones. Incluye ocho módulos, tres microvideos subtitulados, 48 preguntas, seis simuladores, certificación, asistente SACI, ficha digital con fotografías y firma, ranking y exportaciones.
+Plataforma de formación, práctica y trazabilidad para la recepción segura de armazones. Incluye ocho experiencias formativas con microvideos, 24 ejemplos visuales y práctica guiada sin cuestionarios, seis simuladores, trivias, evaluación final, certificación, asistente SACI, ficha digital con fotografías y firma, ranking y exportaciones.
 
 ## Puesta en marcha
 

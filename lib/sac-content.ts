@@ -27,6 +27,20 @@ export type SacModule = {
   poster: string;
 };
 
+export type TrainingExample = {
+  id: string;
+  title: string;
+  label: string;
+  tone: "seguro" | "atencion" | "pausa";
+  context: string;
+  observe: string;
+  action: string;
+  evidence: string;
+  image: string;
+  imageAlt: string;
+  crop?: "full" | "top-left" | "top-right" | "bottom-left" | "bottom-right";
+};
+
 export type QuizQuestion = {
   id: string;
   moduleId: string;
@@ -86,7 +100,12 @@ export type BotKnowledgeItem = {
   escalation: boolean;
 };
 
-export const CONTENT_VERSION = "SAC-2026.09.05-v1" as const;
+export const CONTENT_VERSION = "SAC-2026.09.06-v2" as const;
+export const MODULE_EXPERIENCE_TOKENS = [
+  "demo:seen",
+  "examples:explored",
+  "practice:completed",
+] as const;
 
 const media = {
   reception: {
@@ -465,6 +484,324 @@ export const sacModules: SacModule[] = [
     ...media.risks,
   },
 ];
+
+export const trainingExamples: Record<string, TrainingExample[]> = {
+  "sac-01": [
+    {
+      id: "recepcion-compartida",
+      title: "La revisión ocurre junto al cliente",
+      label: "Ejemplo correcto",
+      tone: "seguro",
+      context: "Andrea recibe un armazón para ajuste y lo mantiene visible mientras confirma el servicio solicitado.",
+      observe: "Antes de manipular, compara alineación, bisagras, puente, varillas y superficie de las lunas.",
+      action: "Muestra lo observado, explica qué se hará y confirma que ambas personas comparten la misma línea base.",
+      evidence: "Registro inicial con servicio, estado observable y responsable de la recepción.",
+      image: "/media/sac-hero-recepcion.png",
+      imageAlt: "Asesora inspeccionando un armazón junto a la cliente",
+    },
+    {
+      id: "hallazgo-lateral",
+      title: "La luz revela una condición nueva",
+      label: "Pausa necesaria",
+      tone: "pausa",
+      context: "Al girar el armazón bajo luz lateral aparece una línea fina junto al puente que no era visible al inicio.",
+      observe: "La línea cruza el material y puede corresponder a una microfisura; no debe probarse con fuerza.",
+      action: "Detén la recepción, muestra la zona, conserva el producto y solicita validación técnica.",
+      evidence: "Vista general más acercamiento nítido de la línea y nota de escalamiento.",
+      image: "/media/sac-casos-inspeccion.png",
+      imageAlt: "Acercamiento de una microfisura junto al puente del armazón",
+      crop: "bottom-right",
+    },
+    {
+      id: "explicacion-previa",
+      title: "Primero se explica; después se acepta",
+      label: "Ejemplo de servicio",
+      tone: "atencion",
+      context: "El cliente pregunta si el ajuste garantiza que el armazón no cambiará durante el procedimiento.",
+      observe: "La inquietud requiere una respuesta clara, no una promesa absoluta ni una firma apresurada.",
+      action: "Describe la condición observada, la manipulación prevista y el siguiente paso; luego verifica comprensión.",
+      evidence: "Aceptación vinculada al mismo texto que fue explicado y mostrado.",
+      image: "/media/sac-conversacion-cliente.png",
+      imageAlt: "Asesor explicando al cliente el estado de un armazón",
+    },
+  ],
+  "sac-02": [
+    {
+      id: "armazon-estable",
+      title: "Referencia de un armazón estable",
+      label: "Punto de comparación",
+      tone: "seguro",
+      context: "El frente conserva simetría, las varillas apoyan de forma pareja y no hay separaciones visibles.",
+      observe: "Aro, puente, bisagras, tornillos, varillas y plaquetas mantienen continuidad y alineación.",
+      action: "Completa igualmente el recorrido sistemático y registra la condición estable.",
+      evidence: "Vista frontal centrada que permite verificar simetría y estado general.",
+      image: "/media/sac-casos-inspeccion.png",
+      imageAlt: "Armazón óptico intacto, simétrico y alineado",
+      crop: "top-left",
+    },
+    {
+      id: "bisagra-floja",
+      title: "Bisagra abierta y varilla desalineada",
+      label: "Requiere atención",
+      tone: "atencion",
+      context: "La varilla derecha presenta juego y se separa del frente más de lo esperado.",
+      observe: "El tornillo no asienta por completo y existe una abertura visible en la unión.",
+      action: "Evita forzar el movimiento, registra lado y componente, y valida antes de ajustar.",
+      evidence: "Detalle de la bisagra derecha y nota sobre el juego observado.",
+      image: "/media/sac-casos-inspeccion.png",
+      imageAlt: "Bisagra de armazón con tornillo flojo y varilla separada",
+      crop: "top-right",
+    },
+    {
+      id: "plaqueta-desgastada",
+      title: "Plaqueta deformada y soporte irregular",
+      label: "Desgaste visible",
+      tone: "atencion",
+      context: "Una plaqueta está opaca, deformada y apoyada en un ángulo distinto a la otra.",
+      observe: "El desgaste altera el apoyo y puede ocultar tensión o una pieza debilitada.",
+      action: "Describe qué lado está afectado y comprueba el soporte con movimientos mínimos.",
+      evidence: "Acercamiento de ambas plaquetas para comparar forma, superficie y orientación.",
+      image: "/media/sac-casos-inspeccion.png",
+      imageAlt: "Plaquetas nasales desgastadas y desalineadas",
+      crop: "bottom-left",
+    },
+  ],
+  "sac-03": [
+    {
+      id: "apoyo-controlado",
+      title: "Apoyo cerca del punto de trabajo",
+      label: "Técnica segura",
+      tone: "seguro",
+      context: "El armazón está estable y el ajuste se realizará en una zona sin fisuras ni reparaciones.",
+      observe: "La fuerza puede distribuirse sin usar bisagras, soldaduras o zonas debilitadas como palanca.",
+      action: "Sujeta cerca del punto de ajuste, trabaja en incrementos pequeños y reevalúa entre movimientos.",
+      evidence: "Registro del material, punto intervenido y condición antes y después.",
+      image: "/media/sac-casos-inspeccion.png",
+      imageAlt: "Armazón estable usado como referencia para una manipulación controlada",
+      crop: "top-left",
+    },
+    {
+      id: "calor-no-rutinario",
+      title: "El calor nunca se aplica por rutina",
+      label: "Precaución técnica",
+      tone: "atencion",
+      context: "Un armazón de material incierto tiene una reparación previa cerca de la zona solicitada.",
+      observe: "El material y la reparación pueden responder de forma distinta al calor o a la presión.",
+      action: "Identifica material y antecedentes; si no existe certeza técnica, pausa y valida la maniobra.",
+      evidence: "Detalle de la reparación y constancia de la validación recibida.",
+      image: "/media/sac-inspeccion-fisura.png",
+      imageAlt: "Detalle de una fisura y reparación próxima a una bisagra",
+    },
+    {
+      id: "reaccion-inesperada",
+      title: "Una reacción inesperada cambia el plan",
+      label: "Detener de inmediato",
+      tone: "pausa",
+      context: "Durante un movimiento mínimo se percibe un sonido y aparece una línea junto al puente.",
+      observe: "La nueva señal modifica el estado inicial y puede comprometer la estructura.",
+      action: "Suelta la carga, apoya el producto, conserva la zona sin limpiar y escala el caso.",
+      evidence: "Secuencia de hechos, imágenes del cambio y persona que recibe el escalamiento.",
+      image: "/media/sac-casos-inspeccion.png",
+      imageAlt: "Microfisura visible en el puente de un armazón",
+      crop: "bottom-right",
+    },
+  ],
+  "sac-04": [
+    {
+      id: "riesgo-bajo",
+      title: "Bajo: estable y de baja complejidad",
+      label: "Continuar con control",
+      tone: "seguro",
+      context: "Producto estable, sin señales estructurales y con una intervención sencilla.",
+      observe: "No hay fisuras, piezas críticas flojas ni reparaciones que cambien la resistencia.",
+      action: "Revisa, explica, registra y continúa con el procedimiento autorizado.",
+      evidence: "Vista general y registro del estado estable.",
+      image: "/media/sac-casos-inspeccion.png",
+      imageAlt: "Armazón estable que representa un nivel de riesgo bajo",
+      crop: "top-left",
+    },
+    {
+      id: "riesgo-medio",
+      title: "Medio: desgaste que exige precaución",
+      label: "Validar el método",
+      tone: "atencion",
+      context: "Existe holgura o desgaste, pero no una pérdida estructural evidente.",
+      observe: "La condición, el material y la complejidad de la maniobra deben leerse en conjunto.",
+      action: "Documenta con detalle y aplica la validación definida antes de intervenir.",
+      evidence: "Detalle del componente y justificación del nivel asignado.",
+      image: "/media/sac-casos-inspeccion.png",
+      imageAlt: "Bisagra floja que representa un nivel de riesgo medio",
+      crop: "top-right",
+    },
+    {
+      id: "riesgo-alto",
+      title: "Alto: señal estructural crítica",
+      label: "Pausar y escalar",
+      tone: "pausa",
+      context: "Una fisura cruza el material en una zona que recibirá carga durante el trabajo.",
+      observe: "La aceptación del cliente no cambia la condición técnica ni autoriza la maniobra.",
+      action: "Pausa, protege el producto y espera una decisión autorizada.",
+      evidence: "Imágenes de contexto y detalle, nivel alto y responsable que valida.",
+      image: "/media/sac-inspeccion-fisura.png",
+      imageAlt: "Fisura estructural en un armazón que representa riesgo alto",
+    },
+  ],
+  "sac-05": [
+    {
+      id: "mostrar-hechos",
+      title: "Mostrar hechos sin dramatizar",
+      label: "Lenguaje profesional",
+      tone: "seguro",
+      context: "El asesor encuentra una holgura y mantiene el armazón visible durante la explicación.",
+      observe: "El cliente necesita ubicar el hallazgo y entender por qué cambia el procedimiento.",
+      action: "Di: «Quiero mostrarle esta zona para que tengamos el mismo registro antes de continuar».",
+      evidence: "Descripción neutral con ubicación, apariencia y siguiente paso.",
+      image: "/media/sac-conversacion-cliente.png",
+      imageAlt: "Asesor conversando con el cliente mientras muestra un armazón",
+    },
+    {
+      id: "escuchar-inquietud",
+      title: "Escuchar antes de responder",
+      label: "Conversación guiada",
+      tone: "atencion",
+      context: "El cliente expresa preocupación por una reparación anterior y teme un cambio durante el ajuste.",
+      observe: "Interrumpir o minimizar aumenta la tensión y dificulta confirmar la comprensión.",
+      action: "Escucha completa, reconoce la preocupación y explica la revisión y la validación disponibles.",
+      evidence: "Nota breve de la inquietud y del siguiente paso acordado.",
+      image: "/media/sac-conversacion-cliente.png",
+      imageAlt: "Conversación atenta entre asesor y cliente",
+    },
+    {
+      id: "desacuerdo",
+      title: "Sin acuerdo, la recepción se pausa",
+      label: "Escalamiento de servicio",
+      tone: "pausa",
+      context: "El cliente no reconoce una fisura mostrada durante la inspección inicial.",
+      observe: "No existe una línea base compartida y continuar aumentaría el conflicto.",
+      action: "No discutas ni presiones; conserva el producto a la vista y solicita apoyo autorizado.",
+      evidence: "Hallazgo, evidencia mostrada, desacuerdo y persona que interviene.",
+      image: "/media/sac-hero-recepcion.png",
+      imageAlt: "Asesora mostrando el armazón a la cliente durante la recepción",
+    },
+  ],
+  "sac-06": [
+    {
+      id: "vista-general",
+      title: "Primero una vista que ubique el producto",
+      label: "Foto de contexto",
+      tone: "seguro",
+      context: "La imagen frontal muestra el armazón completo, centrado y sobre un fondo limpio.",
+      observe: "La orientación permite reconocer lado, forma y condición general sin depender de la memoria.",
+      action: "Captura frontal, lateral derecha y lateral izquierda antes de los acercamientos.",
+      evidence: "Serie general consistente asociada al identificador de la recepción.",
+      image: "/media/sac-casos-inspeccion.png",
+      imageAlt: "Vista frontal completa y centrada de un armazón",
+      crop: "top-left",
+    },
+    {
+      id: "detalle-ubicable",
+      title: "El detalle debe poder ubicarse",
+      label: "Macro útil",
+      tone: "seguro",
+      context: "Un acercamiento enfocado muestra la línea exacta junto a la bisagra derecha.",
+      observe: "El detalle es útil porque existe una vista general previa y una descripción del lado y componente.",
+      action: "Combina contexto y acercamiento, controla reflejos y confirma el enfoque antes de guardar.",
+      evidence: "«Fisura fina en unión superior de bisagra derecha» vinculada a ambas imágenes.",
+      image: "/media/sac-inspeccion-fisura.png",
+      imageAlt: "Fotografía macro enfocada de una fisura junto a una bisagra",
+    },
+    {
+      id: "foto-insuficiente",
+      title: "Una foto aislada no cuenta toda la historia",
+      label: "Evitar",
+      tone: "atencion",
+      context: "Solo existe un acercamiento sin orientación, con brillo y sin indicar el lado del armazón.",
+      observe: "Otra persona no podría localizar el hallazgo ni compararlo con el estado general.",
+      action: "Repite la toma con fondo limpio, luz lateral, enfoque y una vista de contexto.",
+      evidence: "Nueva serie que permite localizar, verificar y comparar.",
+      image: "/media/sac-casos-inspeccion.png",
+      imageAlt: "Acercamiento de una plaqueta que necesita contexto fotográfico",
+      crop: "bottom-left",
+    },
+  ],
+  "sac-07": [
+    {
+      id: "expediente-coherente",
+      title: "Texto, fotografía y riesgo cuentan lo mismo",
+      label: "Registro completo",
+      tone: "seguro",
+      context: "La ficha identifica el servicio, el estado, la imagen y la decisión aplicada al mismo producto.",
+      observe: "No existen campos predeterminados sin validar ni contradicciones entre el texto y la evidencia.",
+      action: "Lee el expediente de principio a fin antes de mostrarlo al cliente.",
+      evidence: "Ficha verificable con responsables, fecha, nivel y archivos relacionados.",
+      image: "/media/sac-hero-recepcion.png",
+      imageAlt: "Recepción de un armazón con revisión compartida",
+    },
+    {
+      id: "hallazgo-omitido",
+      title: "La imagen muestra algo que el texto omite",
+      label: "Corregir antes de aceptar",
+      tone: "atencion",
+      context: "La fotografía revela una fisura, pero la ficha solo dice «desgaste normal».",
+      observe: "La descripción no permite verificar el hallazgo ni justifica el nivel de riesgo.",
+      action: "Corrige ubicación y condición, reclasifica si corresponde y vuelve a mostrar el registro.",
+      evidence: "Texto actualizado que coincide con la imagen y conserva quién realizó el cambio.",
+      image: "/media/sac-inspeccion-fisura.png",
+      imageAlt: "Fisura visible que debe estar descrita en la ficha",
+    },
+    {
+      id: "enmienda-trazable",
+      title: "Un expediente cerrado no se sobrescribe",
+      label: "Historial protegido",
+      tone: "seguro",
+      context: "Después del cierre se detecta un dato incompleto sobre una reparación previa.",
+      observe: "Cambiar el original eliminaría la historia de lo que fue aceptado.",
+      action: "Conserva el registro original y agrega una enmienda con motivo, fecha y responsable.",
+      evidence: "Original más enmienda claramente vinculada y fechada.",
+      image: "/media/sac-conversacion-cliente.png",
+      imageAlt: "Asesor explicando un registro al cliente",
+    },
+  ],
+  "sac-08": [
+    {
+      id: "senal-critica",
+      title: "La señal crítica detiene la operación",
+      label: "Pausa inmediata",
+      tone: "pausa",
+      context: "Una fisura atraviesa una zona estructural que iba a recibir presión durante el ajuste.",
+      observe: "Manipular nuevamente puede modificar el estado y destruir evidencia útil.",
+      action: "Detén, apoya el producto en superficie protegida y conserva las piezas.",
+      evidence: "Estado actual desde varias vistas y secuencia exacta de lo ocurrido.",
+      image: "/media/sac-inspeccion-fisura.png",
+      imageAlt: "Fisura crítica en la estructura de un armazón",
+    },
+    {
+      id: "proteger-evidencia",
+      title: "Pausar también significa proteger",
+      label: "Acción controlada",
+      tone: "atencion",
+      context: "Una pieza se afloja durante la revisión y permanece junto al armazón.",
+      observe: "Limpiar, ajustar o descartar la pieza cambiaría el estado que debe revisarse.",
+      action: "No corrijas; separa el área, conserva la pieza y documenta antes de mover nuevamente.",
+      evidence: "Vista general, detalle de la pieza y nota sobre la última acción realizada.",
+      image: "/media/sac-casos-inspeccion.png",
+      imageAlt: "Bisagra separada y pieza suelta de un armazón",
+      crop: "top-right",
+    },
+    {
+      id: "entrega-completa",
+      title: "Escalar es entregar un caso verificable",
+      label: "Resumen autorizado",
+      tone: "seguro",
+      context: "La persona responsable necesita decidir sin repetir una manipulación insegura.",
+      observe: "Faltan decisiones confiables cuando no se informa servicio, estado inicial, acciones y cambio observado.",
+      action: "Entrega identificador, solicitud, hallazgo, secuencia, evidencia, situación del cliente y validación requerida.",
+      evidence: "Registro de quién recibe, qué decide, cuándo lo hace y cuál es el siguiente paso.",
+      image: "/media/sac-conversacion-cliente.png",
+      imageAlt: "Profesional explicando un caso de manera clara y verificable",
+    },
+  ],
+};
 
 export const questionBank: QuizQuestion[] = [
   {

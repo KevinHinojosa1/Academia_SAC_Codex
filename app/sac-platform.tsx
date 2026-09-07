@@ -189,7 +189,9 @@ export default function SacPlatform() {
       });
       await loadProgress();
       notify(
-        result.attempt.passed
+        activityId.startsWith("module-") && result.attempt.passed
+          ? "Experiencia formativa completada y guardada."
+          : result.attempt.passed
           ? `Actividad completada: ${result.attempt.score}/${result.attempt.maxScore}.`
           : `Resultado registrado: ${result.attempt.score}/${result.attempt.maxScore}.`,
       );

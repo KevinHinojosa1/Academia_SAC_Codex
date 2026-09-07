@@ -27,6 +27,9 @@ test("publishes a complete and coherent SAC curriculum", async () => {
   assert.equal(content.protocolOrder.length, 8);
   assert.equal(content.visualFindings.length, 6);
   assert.equal(content.checklistChallenge.filter((item) => item.required).length, 8);
+  assert.equal(Object.keys(content.trainingExamples).length, 8);
+  assert.ok(Object.values(content.trainingExamples).every((examples) => examples.length === 3));
+  assert.equal(content.MODULE_EXPERIENCE_TOKENS.length, 3);
   assert.ok(content.botKnowledge.length >= 18);
   assert.ok(content.botKnowledge.every((item) => item.response.startsWith("SAC indica:")));
   const escalationAnswer = content.botKnowledge.find((item) => item.id === "bot-escalamiento");
@@ -46,9 +49,9 @@ test("scores every activity on the server and enforces real pass thresholds", as
   const key = (activityId) => `${activityId}:test-key`;
   const evaluate = (activityId, answers) => evaluateActivity({ activityId, answers, idempotencyKey: key(activityId) });
 
-  const moduleAnswers = content.questionBank.filter((q) => q.moduleId === "sac-01").map((q) => q.answer);
-  assert.equal(evaluate("module-1", moduleAnswers).passed, true);
-  assert.throws(() => evaluate("module-1", []), /seis respuestas/i);
+  assert.equal(evaluate("module-1", [...content.MODULE_EXPERIENCE_TOKENS]).passed, true);
+  assert.equal(evaluate("module-1", ["demo:seen", "examples:explored", "practice:incomplete"]).passed, false);
+  assert.throws(() => evaluate("module-1", []), /demostración/i);
 
   const finalAnswers = content.finalQuizQuestions.map((q) => q.answer);
   assert.equal(evaluate("quiz-final", finalAnswers).score, 8);
@@ -80,6 +83,7 @@ test("ships playable videos, captions and downloadable operating files", async (
   assert.ok((await stat(path.join(root, "public", "resources", "registro-sac.xlsx"))).size > 100_000);
   assert.ok((await stat(path.join(root, "public", "resources", "formato-recepcion-sac.pdf"))).size > 5_000);
   assert.ok((await stat(path.join(root, "public", "media", "saci-mascota.png"))).size > 2_000_000);
+  assert.ok((await stat(path.join(root, "public", "media", "sac-casos-inspeccion.png"))).size > 1_000_000);
 });
 
 test("uses SAC consistently and keeps the informed-consent text aligned", async () => {
@@ -103,6 +107,13 @@ test("uses SAC consistently and keeps the informed-consent text aligned", async 
   assert.match(mascotSource, /SACI, mascota del Área de SAC/);
   assert.match(mascotSource, /Coach de Servicio al Cliente/);
   assert.match(mascotSource, /\/media\/saci-mascota\.png/);
+
+  const trainingSource = await readFile(path.join(root, "app/components/training-experience.tsx"), "utf8");
+  assert.doesNotMatch(trainingSource, /MINIEVALUACIÓN · 5\/6/);
+  assert.doesNotMatch(trainingSource, /questionBank/);
+  assert.match(trainingSource, /Aquí no hay preguntas/);
+  assert.match(trainingSource, /Explorar ejemplos/);
+  assert.match(trainingSource, /Práctica guiada/i);
 });
 
 test("keeps PIN hashing within the Cloudflare Workers PBKDF2 limit", async () => {

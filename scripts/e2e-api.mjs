@@ -4,8 +4,8 @@ import {
   checklistChallenge,
   conversationCases,
   finalQuizQuestions,
+  MODULE_EXPERIENCE_TOKENS,
   protocolOrder,
-  questionBank,
   riskCases,
   sacModules,
   triviaQuestions,
@@ -65,35 +65,35 @@ assert.match(await home.text(), /SAC/);
 
 const adviser = await login("SAC-1001", "2468");
 assert.equal(adviser.user.role, "asesor");
-await json("/api/progress", { cookie: adviser.cookie });
+const adviserProgressBefore = await json("/api/progress", { cookie: adviser.cookie });
 await json("/api/admin/receptions", { cookie: adviser.cookie, expected: 403 });
 
 const optometrist = await login("SAC-2001", "1357");
 assert.equal(optometrist.user.role, "optometra");
 await json("/api/progress", { cookie: optometrist.cookie });
 
-await json("/api/progress/complete", {
-  cookie: adviser.cookie,
-  method: "POST",
-  body: JSON.stringify({
-    activityId: "quiz-final",
-    answers: finalQuizQuestions.map((question) => question.answer),
-    idempotencyKey: `quiz-final:blocked-${crypto.randomUUID()}`,
-  }),
-  expected: 409,
-});
+const completedTrainingBefore = adviserProgressBefore.body.modules.filter(
+  (row) => row.status === "completed" && /^sac-0[1-8]$/.test(row.moduleId),
+).length;
+if (completedTrainingBefore < sacModules.length) {
+  await json("/api/progress/complete", {
+    cookie: adviser.cookie,
+    method: "POST",
+    body: JSON.stringify({
+      activityId: "quiz-final",
+      answers: finalQuizQuestions.map((question) => question.answer),
+      idempotencyKey: `quiz-final:blocked-${crypto.randomUUID()}`,
+    }),
+    expected: 409,
+  });
+}
 
 for (const learningModule of sacModules) {
-  const answers = questionBank
-    .filter((question) => question.moduleId === learningModule.id)
-    .map((question) => question.answer);
-  const result = await complete(adviser.cookie, `module-${learningModule.order}`, answers);
+  const result = await complete(adviser.cookie, `module-${learningModule.order}`, [...MODULE_EXPERIENCE_TOKENS]);
   assert.equal(result.body.attempt.passed, true);
 }
 
-const firstModuleAnswers = questionBank
-  .filter((question) => question.moduleId === sacModules[0].id)
-  .map((question) => question.answer);
+const firstModuleAnswers = [...MODULE_EXPERIENCE_TOKENS];
 const repeatKey = `module-1:repeat-${crypto.randomUUID()}`;
 const firstAttempt = await complete(adviser.cookie, "module-1", firstModuleAnswers, repeatKey);
 const repeatedAttempt = await json("/api/progress/complete", {
