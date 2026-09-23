@@ -4,11 +4,15 @@ services:
     runtime: node
     plan: free
     region: oregon
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
         value: 22.14.0
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
+      - key: SITES_BUILD_TIMEOUT
+        value: "10m"
       - key: WRANGLER_WRITE_LOGS
         value: "false"
       - key: WRANGLER_LOG_PATH
