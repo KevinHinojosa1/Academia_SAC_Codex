@@ -2,22 +2,28 @@
 
 import {
   BadgeCheck,
+  Check,
   ChevronRight,
   ClipboardPlus,
   Coins,
   Database,
+  Eye,
   Gamepad2,
+  Glasses,
   GraduationCap,
   Home,
   LoaderCircle,
   LogOut,
   Menu,
+  Mic,
   Moon,
+  Palette,
   Play,
   ShieldCheck,
   Sparkles,
   Sun,
   Trophy,
+  Wrench,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -29,6 +35,134 @@ import DataCenter from "./components/data-center";
 import SacCoach from "./components/sac-coach";
 import SaciAvatar from "./components/saci-avatar";
 import { sacModules } from "@/lib/sac-content";
+
+type AvatarOption = {
+  id: string;
+  label: string;
+  subtitle: string;
+  category: "saci" | "especialidad" | "color";
+  image?: string;
+  icon?: typeof Glasses;
+  gradient?: string;
+  color?: string;
+};
+
+const AVATAR_OPTIONS: AvatarOption[] = [
+  {
+    id: "saci-mascot",
+    label: "SACI Mascota",
+    subtitle: "El Coach de Servicio SAC",
+    category: "saci",
+    image: "/media/saci-mascota.png",
+  },
+  {
+    id: "asesor-glasses",
+    label: "Asesor / Asesora Óptica",
+    subtitle: "Atención al cliente y vitrina",
+    category: "especialidad",
+    icon: Glasses,
+    gradient: "linear-gradient(135deg, #0ea5e9, #0284c7)",
+    color: "#ffffff",
+  },
+  {
+    id: "optometra-eye",
+    label: "Optometría Clínica",
+    subtitle: "Gabinete y refracción",
+    category: "especialidad",
+    icon: Eye,
+    gradient: "linear-gradient(135deg, #10b981, #059669)",
+    color: "#ffffff",
+  },
+  {
+    id: "taller-wrench",
+    label: "Taller & Montaje",
+    subtitle: "Biselado, ajustes y laboratorio",
+    category: "especialidad",
+    icon: Wrench,
+    gradient: "linear-gradient(135deg, #f59e0b, #d97706)",
+    color: "#ffffff",
+  },
+  {
+    id: "initials-mint",
+    label: "Menta SAC (Original)",
+    subtitle: "Tus iniciales corporativas",
+    category: "color",
+    gradient: "linear-gradient(135deg, #dded91, #71d8c5)",
+    color: "#17434a",
+  },
+  {
+    id: "initials-sapphire",
+    label: "Zafiro Profundo",
+    subtitle: "Iniciales en azul océano",
+    category: "color",
+    gradient: "linear-gradient(135deg, #38bdf8, #0369a1)",
+    color: "#ffffff",
+  },
+  {
+    id: "initials-gold",
+    label: "Oro SAC Premium",
+    subtitle: "Iniciales en ámbar dorado",
+    category: "color",
+    gradient: "linear-gradient(135deg, #fde047, #ca8a04)",
+    color: "#422006",
+  },
+  {
+    id: "initials-amethyst",
+    label: "Amatista & Púrpura",
+    subtitle: "Iniciales en violeta real",
+    category: "color",
+    gradient: "linear-gradient(135deg, #c084fc, #7e22ce)",
+    color: "#ffffff",
+  },
+  {
+    id: "initials-coral",
+    label: "Coral Energético",
+    subtitle: "Iniciales en rubí y coral",
+    category: "color",
+    gradient: "linear-gradient(135deg, #fb7185, #e11d48)",
+    color: "#ffffff",
+  },
+];
+
+function renderUserAvatar(avatarId: string, user: SacUser) {
+  const opt = AVATAR_OPTIONS.find((a) => a.id === avatarId) || AVATAR_OPTIONS[4];
+  const initials = user.fullName
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  if (opt.image) {
+    return (
+      <span className="sac-avatar sac-avatar-img">
+        <Image src={opt.image} alt={user.fullName} width={40} height={40} className="avatar-inner-img" />
+      </span>
+    );
+  }
+
+  if (opt.icon) {
+    const IconComp = opt.icon;
+    return (
+      <span
+        className="sac-avatar sac-avatar-icon"
+        style={{ background: opt.gradient, color: opt.color }}
+      >
+        <IconComp aria-hidden="true" />
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="sac-avatar sac-avatar-text"
+      style={{ background: opt.gradient, color: opt.color }}
+    >
+      {initials}
+    </span>
+  );
+}
 
 export type SacUser = {
   id: string;
@@ -121,6 +255,8 @@ export default function SacPlatform() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [coachOpen, setCoachOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string | null>(null);
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
   const notify = useCallback((message: string) => {
     setToast(message);
@@ -152,6 +288,26 @@ export default function SacPlatform() {
       .finally(() => setChecking(false));
     return () => window.cancelAnimationFrame(themeFrame);
   }, [loadProgress]);
+
+  const customAvatar = useMemo(() => {
+    if (selectedAvatarId) return selectedAvatarId;
+    if (typeof window !== "undefined" && user) {
+      const saved = window.localStorage.getItem(`sac-avatar-${user.id}`);
+      if (saved) return saved;
+    }
+    if (user?.role === "optometra") return "optometra-eye";
+    if (user?.role === "admin") return "saci-mascot";
+    return "initials-mint";
+  }, [selectedAvatarId, user]);
+
+  const selectAvatar = (id: string) => {
+    setSelectedAvatarId(id);
+    if (user && typeof window !== "undefined") {
+      window.localStorage.setItem(`sac-avatar-${user.id}`, id);
+    }
+    setAvatarModalOpen(false);
+    notify("Avatar actualizado.");
+  };
 
   const toggleTheme = () => {
     const next = theme === "light" ? "dark" : "light";
@@ -241,7 +397,7 @@ export default function SacPlatform() {
       <aside className={`sac-sidebar ${menuOpen ? "is-open" : ""}`} aria-label="Navegación principal">
         <div className="sac-brand">
           <SaciAvatar className="sac-brand-mascot" />
-          <div><strong>SAC</strong><span>Recepción segura</span></div>
+          <div><strong>SAC te dice</strong><span>Escuela de Excelencia Óptica</span></div>
           <button className="icon-button sidebar-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú"><X /></button>
         </div>
         <nav>
@@ -265,7 +421,16 @@ export default function SacPlatform() {
           <div><strong>Protocolo SAC</strong><span>Versión 2026.1</span></div>
         </div>
         <div className="sac-user-card">
-          <span className="sac-avatar">{user.fullName.split(" ").map((part) => part[0]).slice(0, 2).join("")}</span>
+          <button
+            type="button"
+            className="sac-avatar-trigger"
+            onClick={() => setAvatarModalOpen(true)}
+            title="Personalizar avatar (clic para cambiar)"
+            aria-label="Personalizar avatar"
+          >
+            {renderUserAvatar(customAvatar, user)}
+            <span className="avatar-edit-badge" aria-hidden="true">✎</span>
+          </button>
           <div><strong>{user.fullName}</strong><span>{roleLabel(user.role)} · {user.store}</span></div>
           <button className="icon-button" onClick={logout} aria-label="Cerrar sesión"><LogOut /></button>
         </div>
@@ -276,7 +441,7 @@ export default function SacPlatform() {
       <div className="sac-main-shell">
         <header className="sac-topbar">
           <button className="icon-button mobile-menu" onClick={() => setMenuOpen(true)} aria-label="Abrir menú"><Menu /></button>
-          <div className="topbar-title"><span>SAC</span><strong>{navItems.find((item) => item.id === view)?.label}</strong></div>
+          <div className="topbar-title"><span>SAC te dice</span><strong>{navItems.find((item) => item.id === view)?.label}</strong></div>
           <div className="topbar-actions">
             <div className="status-chip"><Coins aria-hidden="true" /><strong>{progress?.balance.coins ?? 0}</strong><span>monedas</span></div>
             <button className="icon-button" onClick={toggleTheme} aria-label={theme === "light" ? "Activar modo oscuro" : "Activar modo claro"}>
@@ -322,9 +487,22 @@ export default function SacPlatform() {
 
       <button className="coach-launcher" onClick={() => setCoachOpen(true)} aria-label="Abrir asistente SACI">
         <SaciAvatar className="coach-launcher-avatar" alt="" />
-        <span className="coach-launcher-copy"><strong>Pregúntale a SACI</strong><small>Coach de Servicio al Cliente</small></span>
+        <span className="coach-launcher-copy"><strong>Pregúntale a SACI</strong><small>Coach de servicio al cliente</small></span>
+        <span className="coach-launcher-voice-badge" title="Voz y Roleplay interactivo"><Mic /></span>
       </button>
-      <SacCoach open={coachOpen} onClose={() => setCoachOpen(false)} />
+      <SacCoach
+        open={coachOpen}
+        onClose={() => setCoachOpen(false)}
+        user={user}
+        onRewardXp={(xp, reason) => notify(`¡+${xp} XP otorgados por el Coach SACI! ${reason}`)}
+      />
+      <AvatarModal
+        open={avatarModalOpen}
+        onClose={() => setAvatarModalOpen(false)}
+        currentAvatarId={customAvatar}
+        onSelect={selectAvatar}
+        user={user}
+      />
       <div className="toast-region" aria-live="polite" aria-atomic="true">{toast && <div className="sac-toast"><BadgeCheck />{toast}</div>}</div>
     </div>
   );
@@ -349,12 +527,18 @@ function LoginScreen({ onLogin }: { onLogin: (code: string, pin: string) => Prom
     }
   };
 
+  const quickFill = (code: string, userPin: string) => {
+    setEmployeeCode(code);
+    setPin(userPin);
+    setError("");
+  };
+
   return (
     <main className="login-page">
       <section className="login-story">
         <div className="login-brand">
           <SaciAvatar className="login-brand-mascot" priority />
-          <span><strong>SAC</strong><small>Recepción segura</small></span>
+          <span><strong>SAC te dice</strong><small>Escuela de Excelencia Óptica</small></span>
         </div>
         <div className="login-copy">
           <span className="eyebrow">EXPERIENCIA OPERATIVA · 2026</span>
@@ -385,6 +569,49 @@ function LoginScreen({ onLogin }: { onLogin: (code: string, pin: string) => Prom
               {busy ? <LoaderCircle className="spin" /> : <ShieldCheck />}{busy ? "Verificando…" : "Ingresar de forma segura"}
             </button>
           </form>
+
+          <div className="pilot-credentials-card">
+            <div className="pilot-cred-header">
+              <span className="eyebrow">ACCESOS PILOTO · ROLES OFICIALES</span>
+              <h3>Credenciales del Equipo</h3>
+            </div>
+            <p className="pilot-cred-desc">Haz clic para autocompletar el código y PIN de prueba:</p>
+            <div className="pilot-cred-grid">
+              <button
+                type="button"
+                className={`pilot-cred-btn ${employeeCode === "SAC-ADMIN" ? "is-selected" : ""}`}
+                onClick={() => quickFill("SAC-ADMIN", "2026")}
+              >
+                <span className="pilot-cred-badge admin">Administración</span>
+                <strong>Camila Ruiz</strong>
+                <code>SAC-ADMIN · PIN 2026</code>
+                <small>Acceso completo: Centro de datos, descargas Excel y métricas</small>
+              </button>
+
+              <button
+                type="button"
+                className={`pilot-cred-btn ${employeeCode === "SAC-1001" ? "is-selected" : ""}`}
+                onClick={() => quickFill("SAC-1001", "2468")}
+              >
+                <span className="pilot-cred-badge asesor">Asesor</span>
+                <strong>Andrea Torres</strong>
+                <code>SAC-1001 · PIN 2468</code>
+                <small>Quito Norte · Formación 3 cápsulas, simuladores y recepción</small>
+              </button>
+
+              <button
+                type="button"
+                className={`pilot-cred-btn ${employeeCode === "SAC-2001" ? "is-selected" : ""}`}
+                onClick={() => quickFill("SAC-2001", "1357")}
+              >
+                <span className="pilot-cred-badge optometra">Optómetra</span>
+                <strong>Mateo Vega</strong>
+                <code>SAC-2001 · PIN 1357</code>
+                <small>Quito Norte · Dictamen técnico de lunas y validaciones</small>
+              </button>
+            </div>
+          </div>
+
           <details className="pilot-access">
             <summary>¿Necesitas acceso?</summary>
             <div>
@@ -394,6 +621,81 @@ function LoginScreen({ onLogin }: { onLogin: (code: string, pin: string) => Prom
         </div>
       </section>
     </main>
+  );
+}
+
+function AvatarModal({
+  open,
+  onClose,
+  currentAvatarId,
+  onSelect,
+  user,
+}: {
+  open: boolean;
+  onClose: () => void;
+  currentAvatarId: string;
+  onSelect: (id: string) => void;
+  user: SacUser;
+}) {
+  if (!open) return null;
+
+  return (
+    <div
+      className="avatar-modal-backdrop"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="avatar-modal-title"
+    >
+      <div className="avatar-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="avatar-modal-head">
+          <div>
+            <span className="eyebrow">
+              <Palette style={{ width: 12, height: 12, display: "inline-block", marginRight: 4 }} />
+              PERSONALIZACIÓN
+            </span>
+            <h2 id="avatar-modal-title">Elige tu Avatar SAC</h2>
+          </div>
+          <button className="icon-button" onClick={onClose} aria-label="Cerrar selección de avatar">
+            <X />
+          </button>
+        </div>
+        <p className="avatar-modal-desc">
+          Selecciona cómo deseas que aparezca tu perfil en la barra lateral y en tus interacciones de la plataforma:
+        </p>
+        <div className="avatar-options-grid">
+          {AVATAR_OPTIONS.map((opt) => {
+            const isSelected = opt.id === currentAvatarId;
+            return (
+              <button
+                type="button"
+                key={opt.id}
+                className={`avatar-option-card ${isSelected ? "is-selected" : ""}`}
+                onClick={() => onSelect(opt.id)}
+              >
+                <div className="avatar-preview-slot">
+                  {renderUserAvatar(opt.id, user)}
+                  {isSelected && (
+                    <span className="avatar-selected-check" aria-hidden="true">
+                      <Check />
+                    </span>
+                  )}
+                </div>
+                <div className="avatar-option-info">
+                  <strong>{opt.label}</strong>
+                  <small>{opt.subtitle}</small>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        <div className="avatar-modal-foot">
+          <button type="button" className="secondary-action" onClick={onClose}>
+            Listo
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -424,8 +726,8 @@ function HomeView({
         <div className="hero-overlay" />
         <div className="hero-content">
           <span className="eyebrow">TU TURNO, {user.fullName.split(" ")[0].toUpperCase()}</span>
-          <h1>Una recepción excelente empieza por mirar juntos.</h1>
-          <p>Observa, explica y registra. SAC convierte cada paso en confianza verificable.</p>
+          <h1>Excelencia, criterio y confianza en cada atención.</h1>
+          <p>Domina el Protocolo de Recepción, la Garantía de Lunas y el Manejo Asertivo de Objeciones con SAC.</p>
           <div className="hero-actions">
             <button className="primary-action" onClick={() => onNavigate(nextModule ? "formacion" : "recepcion")}>
               <Play />{nextModule ? `Continuar: módulo ${nextModule.order}` : "Crear una recepción"}

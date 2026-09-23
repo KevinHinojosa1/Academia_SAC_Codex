@@ -4,6 +4,8 @@ import {
   checklistChallenge,
   conversationCases,
   finalQuizQuestions,
+  lunasQuizQuestions,
+  decirNoQuizQuestions,
   MODULE_EXPERIENCE_TOKENS,
   protocolOrder,
   riskCases,
@@ -42,12 +44,19 @@ type Reward = {
   coins: number;
 };
 
-const moduleRewards: Record<string, { moduleId: string; xp: number }> = Object.fromEntries(
-  sacModules.map((module) => [
-    `module-${module.order}`,
-    { moduleId: module.id, xp: module.xp },
-  ]),
-);
+const moduleRewards: Record<string, { moduleId: string; xp: number }> = {};
+for (const sacMod of sacModules) {
+  moduleRewards[sacMod.id] = { moduleId: sacMod.id, xp: sacMod.xp };
+  if (sacMod.capsuleId === "capsule-lunas") {
+    moduleRewards[`luna-${sacMod.order}`] = { moduleId: sacMod.id, xp: sacMod.xp };
+    moduleRewards[`module-luna-${sacMod.order}`] = { moduleId: sacMod.id, xp: sacMod.xp };
+  } else if (sacMod.capsuleId === "capsule-decir-no") {
+    moduleRewards[`no-${sacMod.order}`] = { moduleId: sacMod.id, xp: sacMod.xp };
+    moduleRewards[`module-no-${sacMod.order}`] = { moduleId: sacMod.id, xp: sacMod.xp };
+  } else {
+    moduleRewards[`module-${sacMod.order}`] = { moduleId: sacMod.id, xp: sacMod.xp };
+  }
+}
 
 function requireNumberAnswers(
   input: z.infer<typeof completionRequestSchema>,
@@ -127,14 +136,15 @@ export function evaluateActivity(input: z.infer<typeof completionRequestSchema>)
   }
 
   if (input.activityId === "quiz-final") {
+    const passThreshold = Math.max(1, Math.ceil(finalQuizQuestions.length * 0.85));
     const answers = requireNumberAnswers(
       input,
       finalQuizQuestions.length,
-      "La certificación requiere ocho respuestas.",
+      `La certificación requiere ${finalQuizQuestions.length} respuestas.`,
     );
     const correct = finalQuizQuestions.map((question) => question.answer);
     const score = scoreOrdered(answers, correct);
-    const passed = score >= 7;
+    const passed = score >= passThreshold;
     return evaluation(
       input.activityId,
       "certificacion",
@@ -143,6 +153,50 @@ export function evaluateActivity(input: z.infer<typeof completionRequestSchema>)
       passed,
       score === correct.length ? { xp: 260, coins: 90 } : { xp: 200, coins: 60 },
       "Certificación aprobada",
+      answers,
+    );
+  }
+
+  if (input.activityId === "quiz-lunas") {
+    const passThreshold = Math.max(1, Math.ceil(lunasQuizQuestions.length * 0.85));
+    const answers = requireNumberAnswers(
+      input,
+      lunasQuizQuestions.length,
+      `La certificación de lunas requiere ${lunasQuizQuestions.length} respuestas.`,
+    );
+    const correct = lunasQuizQuestions.map((question) => question.answer);
+    const score = scoreOrdered(answers, correct);
+    const passed = score >= passThreshold;
+    return evaluation(
+      input.activityId,
+      "certificacion-lunas",
+      score,
+      correct.length,
+      passed,
+      score === correct.length ? { xp: 260, coins: 90 } : { xp: 200, coins: 60 },
+      "Certificación de Lunas aprobada",
+      answers,
+    );
+  }
+
+  if (input.activityId === "quiz-decir-no") {
+    const passThreshold = Math.max(1, Math.ceil(decirNoQuizQuestions.length * 0.85));
+    const answers = requireNumberAnswers(
+      input,
+      decirNoQuizQuestions.length,
+      `La certificación de asertividad requiere ${decirNoQuizQuestions.length} respuestas.`,
+    );
+    const correct = decirNoQuizQuestions.map((question) => question.answer);
+    const score = scoreOrdered(answers, correct);
+    const passed = score >= passThreshold;
+    return evaluation(
+      input.activityId,
+      "certificacion-decir-no",
+      score,
+      correct.length,
+      passed,
+      score === correct.length ? { xp: 260, coins: 90 } : { xp: 200, coins: 60 },
+      "Certificación de Asertividad y Límites Técnicos aprobada",
       answers,
     );
   }

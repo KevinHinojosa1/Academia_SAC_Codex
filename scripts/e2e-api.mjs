@@ -73,7 +73,7 @@ assert.equal(optometrist.user.role, "optometra");
 await json("/api/progress", { cookie: optometrist.cookie });
 
 const completedTrainingBefore = adviserProgressBefore.body.modules.filter(
-  (row) => row.status === "completed" && /^sac-0[1-8]$/.test(row.moduleId),
+  (row) => row.status === "completed" && /^sac-\d{2}$/.test(row.moduleId),
 ).length;
 if (completedTrainingBefore < sacModules.length) {
   await json("/api/progress/complete", {
@@ -110,7 +110,7 @@ const certification = await complete(
   "quiz-final",
   finalQuizQuestions.map((question) => question.answer),
 );
-assert.equal(certification.body.attempt.score, 8);
+assert.equal(certification.body.attempt.score, finalQuizQuestions.length);
 
 const gameInputs = [
   ["risk-lab", riskCases.map((item) => item.answer)],

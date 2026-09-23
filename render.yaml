@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: sac-te-dice
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: WRANGLER_WRITE_LOGS
+        value: "false"
+      - key: WRANGLER_LOG_PATH
+        value: ".wrangler/wrangler.log"
+      - key: MINIFLARE_REGISTRY_PATH
+        value: ".wrangler/registry"

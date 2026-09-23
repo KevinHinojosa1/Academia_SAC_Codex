@@ -3,9 +3,9 @@ import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } fr
 import handler from "vinext/server/app-router-entry";
 
 interface Env {
-  ASSETS: Fetcher;
+  ASSETS?: Fetcher;
   DB: D1Database;
-  IMAGES: {
+  IMAGES?: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
         output(options: { format: string; quality: number }): Promise<{ response(): Response }>;
@@ -30,13 +30,30 @@ const worker = {
     const url = new URL(request.url);
 
     if (url.pathname === "/_vinext/image") {
+      const imageUrl = url.searchParams.get("url");
+
+      // In local development or environments without Cloudflare Assets/Images bindings,
+      // redirect safely to the original static asset so it is served by Vite directly.
+      if (!env.ASSETS || !env.IMAGES) {
+        if (imageUrl && imageUrl.startsWith("/")) {
+          return Response.redirect(new URL(imageUrl, request.url), 307);
+        }
+      }
+
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
       return handleImageOptimization(request, {
-        fetchAsset: (path) => env.ASSETS.fetch(new Request(new URL(path, request.url))),
-        transformImage: async (body, { width, format, quality }) => {
-          const result = await env.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format, quality });
-          return result.response();
+        fetchAsset: (path) => {
+          if (env.ASSETS) {
+            return env.ASSETS.fetch(new Request(new URL(path, request.url)));
+          }
+          return fetch(new URL(path, request.url));
         },
+        transformImage: env.IMAGES
+          ? async (body, { width, format, quality }) => {
+              const result = await env.IMAGES!.input(body).transform(width > 0 ? { width } : {}).output({ format, quality });
+              return result.response();
+            }
+          : undefined,
       }, allowedWidths);
     }
 
