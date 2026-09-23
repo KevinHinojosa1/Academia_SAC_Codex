@@ -6,7 +6,6 @@ services:
     region: oregon
     buildCommand: npm install && npm run build
     startCommand: npm start
-    healthCheckPath: /
     envVars:
       - key: NODE_VERSION
         value: 22.14.0

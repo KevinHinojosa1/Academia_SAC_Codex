@@ -46,7 +46,8 @@ export default defineConfig(async () => {
   return {
     server: {
       host: "0.0.0.0",
-      allowedHosts: [".onrender.com", "localhost", "127.0.0.1", "terminal.local"],
+      port: process.env.PORT ? parseInt(process.env.PORT, 10) : 10000,
+      allowedHosts: true as unknown as string[],
       ...(isCodexSeatbeltSandbox
         ? { watch: { useFsEvents: false, usePolling: true } }
         : {}),
