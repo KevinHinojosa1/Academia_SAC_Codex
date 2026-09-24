@@ -33,9 +33,31 @@ export function errorResponse(error: unknown): Response {
 
 export function assertSameOrigin(request: Request): void {
   const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) {
-    throw new ApiError(403, "INVALID_ORIGIN", "Origen de solicitud no permitido.");
+  if (!origin) return;
+
+  const url = new URL(request.url);
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || url.host;
+  const proto = request.headers.get("x-forwarded-proto") || url.protocol.replace(":", "");
+  const expectedOrigin = `${proto}://${host}`;
+
+  try {
+    const originUrl = new URL(origin);
+    if (
+      origin === expectedOrigin ||
+      origin === url.origin ||
+      originUrl.host === host ||
+      originUrl.hostname === url.hostname ||
+      originUrl.hostname.endsWith(".onrender.com") ||
+      originUrl.hostname === "localhost" ||
+      originUrl.hostname === "127.0.0.1"
+    ) {
+      return;
+    }
+  } catch {
+    // Malformed URL, fall through
   }
+
+  throw new ApiError(403, "INVALID_ORIGIN", "Origen de solicitud no permitido.");
 }
 
 export function noStoreHeaders(): HeadersInit {

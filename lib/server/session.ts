@@ -33,13 +33,21 @@ function parseCookie(header: string | null, name: string): string | null {
 }
 
 export function sessionCookie(token: string, requestUrl: string): string {
-  const secure = new URL(requestUrl).protocol === "https:" ? "; Secure" : "";
-  return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${SESSION_LIFETIME_SECONDS}${secure}`;
+  const isHttps =
+    new URL(requestUrl).protocol === "https:" ||
+    process.env.NODE_ENV === "production" ||
+    requestUrl.includes("onrender.com");
+  const secure = isHttps ? "; Secure" : "";
+  return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_LIFETIME_SECONDS}${secure}`;
 }
 
 export function expiredSessionCookie(requestUrl: string): string {
-  const secure = new URL(requestUrl).protocol === "https:" ? "; Secure" : "";
-  return `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${secure}`;
+  const isHttps =
+    new URL(requestUrl).protocol === "https:" ||
+    process.env.NODE_ENV === "production" ||
+    requestUrl.includes("onrender.com");
+  const secure = isHttps ? "; Secure" : "";
+  return `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`;
 }
 
 export async function sessionTokenHash(request: Request): Promise<string | null> {
