@@ -1,0 +1,25 @@
+name: Render Keep-Alive Bot
+
+on:
+  schedule:
+    # Ejecutar cada 10 minutos para evitar que el servicio gratuito de Render se suspenda tras 15 minutos
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Permite ejecución manual desde GitHub Actions
+
+jobs:
+  ping-render:
+    name: Ping SAC te dice Health Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Service
+        run: |
+          echo "Pinging https://sac-te-dice.onrender.com/api/health at $(date -u)"
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 45 "https://sac-te-dice.onrender.com/api/health" || echo "000")
+          echo "HTTP Status Code: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "Render service is awake and healthy!"
+          else
+            echo "Warning: Received HTTP $HTTP_STATUS, retrying in 5 seconds..."
+            sleep 5
+            curl -f -s -S --max-time 45 "https://sac-te-dice.onrender.com/api/health" || echo "Retry failed, but request reached Render edge."
+          fi
